@@ -1,4 +1,11 @@
+# ==========================================
+# Compilados de Maven y Java
+# ==========================================
 target/
+*.jar
+*.war
+*.ear
+*.class
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -9,11 +16,43 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
+# ==========================================
+# Logs
+# ==========================================
+*.log
+
+# ==========================================
+# Secretos y Entornos Locales
+# ==========================================
+.env
+*.env
+application-local.yml
+application-local.properties
+
+# ==========================================
+# Configuraciones de IDEs
+# ==========================================
+# IntelliJ IDEA
 .idea/
 *.iws
 *.iml
 *.ipr
 out/
 
+# Eclipse / Spring Tool Suite
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# VS Code
+.vscode/
+
+# ==========================================
+# Sistema Operativo
+# ==========================================
 .DS_Store
 Thumbs.db

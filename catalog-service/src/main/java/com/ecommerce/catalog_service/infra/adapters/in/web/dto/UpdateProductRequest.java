@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record UpdateProductRequest(
-        Long requestingUserId, 
+        Long requestingUserId,
         String name,
         String description,
         BigDecimal priceAmount,

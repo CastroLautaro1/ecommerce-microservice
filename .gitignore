@@ -37,7 +37,6 @@ application-local.properties
 *.iws
 *.iml
 *.ipr
-out/
 
 # Eclipse / Spring Tool Suite
 .apt_generated

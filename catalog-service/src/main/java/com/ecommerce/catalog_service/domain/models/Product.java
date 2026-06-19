@@ -61,6 +61,34 @@ public class Product {
         this.active = false;
     }
 
+    public void updateDetails(String newName, String newDescription, Price newPrice, Long newCategoryId, Long requestingUserId) {
+        verifyOwnership(requestingUserId);
+        validateName(newName);
+        if (newCategoryId == null) throw new IllegalArgumentException("El producto debe tener una categoría asociada");
+        if (newPrice == null) throw new IllegalArgumentException("El precio es obligatorio");
+
+        this.name = newName;
+        this.description = newDescription;
+        this.price = newPrice;
+        this.categoryId = newCategoryId;
+    }
+
+    public void replaceImages(List<String> newImageUrls, Long requestingUserId) {
+        verifyOwnership(requestingUserId);
+
+        // Vaciamos la galería actual
+        this.images.clear();
+
+        // Si mandaron nuevas imágenes, las procesamos usando nuestra regla existente
+        if (newImageUrls != null && !newImageUrls.isEmpty()) {
+            boolean isFirst = true;
+            for (String url : newImageUrls) {
+                this.addImage(url, isFirst, requestingUserId); // Validará el límite de 5 automáticamente
+                isFirst = false;
+            }
+        }
+    }
+
     /**
      * Regla de Negocio Compleja: Agregar una imagen.
      * Si la nueva es principal, las demás dejan de serlo.

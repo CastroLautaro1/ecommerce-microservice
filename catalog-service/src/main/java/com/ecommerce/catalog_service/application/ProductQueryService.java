@@ -1,5 +1,6 @@
 package com.ecommerce.catalog_service.application;
 
+import com.ecommerce.catalog_service.domain.exceptions.ProductNotFoundException;
 import com.ecommerce.catalog_service.domain.models.Product;
 import com.ecommerce.catalog_service.domain.ports.in.ProductQueryUseCase;
 import com.ecommerce.catalog_service.domain.ports.out.ProductRepositoryPort;
@@ -21,7 +22,7 @@ public class ProductQueryService implements ProductQueryUseCase {
     public Product getProductDetails(Long id) {
         return repository.findById(id)
                 .filter(Product::isActive)
-                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     @Override

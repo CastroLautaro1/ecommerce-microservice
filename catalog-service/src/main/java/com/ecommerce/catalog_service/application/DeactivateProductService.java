@@ -1,5 +1,6 @@
 package com.ecommerce.catalog_service.application;
 
+import com.ecommerce.catalog_service.domain.exceptions.ProductNotFoundException;
 import com.ecommerce.catalog_service.domain.models.Product;
 import com.ecommerce.catalog_service.domain.ports.in.DeactivateProductCommand;
 import com.ecommerce.catalog_service.domain.ports.in.DeactivateProductUseCase;
@@ -20,7 +21,7 @@ public class DeactivateProductService implements DeactivateProductUseCase {
     @Transactional
     public void execute(DeactivateProductCommand command) {
         Product product = repository.findById(command.productId())
-                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException(command.productId()));
 
         product.deactivate(command.requestingUserId()); // El dominio se encarga de la logica
 

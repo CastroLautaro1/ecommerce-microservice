@@ -1,5 +1,8 @@
 package com.ecommerce.catalog_service.domain.models;
 
+import com.ecommerce.catalog_service.domain.exceptions.ImageLimitExceededException;
+import com.ecommerce.catalog_service.domain.exceptions.UnauthorizedSellerException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,7 +100,7 @@ public class Product {
         verifyOwnership(requestingUserId);
 
         if (this.images.size() >= MAX_IMAGES_ALLOWED) {
-            throw new IllegalStateException("Se alcanzó el límite máximo de " + MAX_IMAGES_ALLOWED + " imágenes");
+            throw new ImageLimitExceededException(MAX_IMAGES_ALLOWED);
         }
 
         // Si la nueva es principal, actualizamos el resto (invariante de negocio)
@@ -138,7 +141,7 @@ public class Product {
     private void verifyOwnership(Long userId) {
         if (!this.sellerId.equals(userId)) {
             // Regla de Marketplace: Solo el dueño puede mutar el producto
-            throw new IllegalStateException("Usuario no autorizado para modificar este producto");
+            throw new UnauthorizedSellerException(userId, this.id);
         }
     }
 

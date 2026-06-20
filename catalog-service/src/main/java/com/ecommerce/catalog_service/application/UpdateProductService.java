@@ -1,5 +1,6 @@
 package com.ecommerce.catalog_service.application;
 
+import com.ecommerce.catalog_service.domain.exceptions.ProductNotFoundException;
 import com.ecommerce.catalog_service.domain.models.Price;
 import com.ecommerce.catalog_service.domain.models.Product;
 import com.ecommerce.catalog_service.domain.ports.in.UpdateProductCommand;
@@ -21,7 +22,7 @@ public class UpdateProductService implements UpdateProductUseCase {
     @Transactional
     public Product execute(UpdateProductCommand command) {
         Product product = repository.findById(command.productId())
-                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException(command.productId()));
 
         Price newPrice = new Price(command.priceAmount(), command.priceCurrency());
 

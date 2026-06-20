@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 
 ### Entorno Local ###
-application-local.yml
+application-local.yaml
 
 ### STS ###
 .apt_generated

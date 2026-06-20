@@ -1,5 +1,8 @@
 package com.ecommerce.catalog_service.infra.adapters.in.web;
 
+import com.ecommerce.catalog_service.domain.exceptions.ImageLimitExceededException;
+import com.ecommerce.catalog_service.domain.exceptions.ProductNotFoundException;
+import com.ecommerce.catalog_service.domain.exceptions.UnauthorizedSellerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +14,24 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // 404 NOT FOUND para recursos inexistentes
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleProductNotFound(ProductNotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    // 403 FORBIDDEN para problemas de permisos
+    @ExceptionHandler(UnauthorizedSellerException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedSellerException ex) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    // 409 CONFLICT para reglas de negocio violadas
+    @ExceptionHandler(ImageLimitExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleImageLimit(ImageLimitExceededException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
 
     /**
      * Captura validaciones de entrada fallidas (ej. "El precio no puede ser negativo").

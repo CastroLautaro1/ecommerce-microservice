@@ -1,5 +1,7 @@
 package com.ecommerce.user_service.domain.models;
 
+import java.util.UUID;
+
 public class Address {
     private String id; // Generado por UUID
     private String street;
@@ -9,13 +11,15 @@ public class Address {
     private String state;
     private boolean isDefault;
 
-    public Address(String street, String number, String zipCode, String city, String state, boolean isDefault) {
-        this.street = street;
-        this.number = number;
-        this.zipCode = zipCode;
-        this.city = city;
-        this.state = state;
-        this.isDefault = isDefault;
+    public Address(String street, String number, String zipCode, String city, String state) {
+        validate(street, number, zipCode, city, state);
+        this.id = UUID.randomUUID().toString();
+        this.street = street.trim();
+        this.number = number.trim();
+        this.zipCode = zipCode.trim();
+        this.city = city.trim();
+        this.state = state.trim();
+        this.isDefault = false; // Por defecto es falso, el Agregado 'User' decidirá si la hace true
     }
 
     public Address(String id, String street, String number, String zipCode, String city, String state, boolean isDefault) {
@@ -28,7 +32,19 @@ public class Address {
         this.isDefault = isDefault;
     }
 
-    // --- Agregar validaciones de dominio
+    private void validate(String street, String number, String zipCode, String city, String state) {
+        if (street == null || street.isBlank()) throw new IllegalArgumentException("La calle es obligatoria");
+        if (number == null || number.isBlank()) throw new IllegalArgumentException("El número o altura es obligatorio");
+        if (zipCode == null || zipCode.isBlank()) throw new IllegalArgumentException("El código postal es obligatorio");
+        if (city == null || city.isBlank()) throw new IllegalArgumentException("La ciudad es obligatoria");
+        if (state == null || state.isBlank()) throw new IllegalArgumentException("La provincia/estado es obligatoria");
+    }
+
+    public void setDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    // GETTERS
 
     public String getId() {
         return id;
@@ -56,29 +72,5 @@ public class Address {
 
     public boolean isDefault() {
         return isDefault;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public void setZipCode(String zipCode) {
-        this.zipCode = zipCode;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
     }
 }

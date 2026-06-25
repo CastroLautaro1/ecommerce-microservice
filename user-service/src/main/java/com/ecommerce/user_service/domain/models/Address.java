@@ -1,6 +1,6 @@
 package com.ecommerce.user_service.domain.models;
 
-public class Adress {
+public class Address {
     private String id; // Generado por UUID
     private String street;
     private String number;
@@ -9,7 +9,7 @@ public class Adress {
     private String state;
     private boolean isDefault;
 
-    public Adress(String street, String number, String zipCode, String city, String state, boolean isDefault) {
+    public Address(String street, String number, String zipCode, String city, String state, boolean isDefault) {
         this.street = street;
         this.number = number;
         this.zipCode = zipCode;
@@ -18,7 +18,7 @@ public class Adress {
         this.isDefault = isDefault;
     }
 
-    public Adress(String id, String street, String number, String zipCode, String city, String state, boolean isDefault) {
+    public Address(String id, String street, String number, String zipCode, String city, String state, boolean isDefault) {
         this.id = id;
         this.street = street;
         this.number = number;

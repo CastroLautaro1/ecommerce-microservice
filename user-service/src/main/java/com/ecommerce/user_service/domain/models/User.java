@@ -85,47 +85,25 @@ public class User {
     }
 
     // GETTERS
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() { return username; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
+    public String getPasswordHash() { return passwordHash; }
 
-    public Role getRole() {
-        return role;
-    }
+    public Role getRole() { return role; }
 
-    public PersonalInfo getPersonalInfo() {
-        return personalInfo;
-    }
+    public PersonalInfo getPersonalInfo() { return personalInfo; }
 
-    public TaxStatus getTaxStatus() {
-        return taxStatus;
-    }
+    public TaxStatus getTaxStatus() { return taxStatus; }
 
-    public List<Address> getAddresses() {
-        return addresses;
-    }
+    public List<Address> getAddresses() { return addresses; }
 
-    public List<SavedPaymentMethod> getPaymentMethods() {
-        return paymentMethods;
-    }
+    public List<SavedPaymentMethod> getPaymentMethods() { return paymentMethods; }
 
-    public boolean isActive() {
-        return active;
-    }
+    public boolean isActive() { return active; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }

@@ -4,7 +4,9 @@ import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.DeactivateAccountUseCase;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DeactivateAccountService implements DeactivateAccountUseCase {
 
     private final UserRepositoryPort userRepository;

@@ -6,7 +6,9 @@ import com.ecommerce.user_service.domain.ports.in.RegisterUserUseCase;
 import com.ecommerce.user_service.domain.ports.out.PasswordEncoderPort;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RegisterUserService implements RegisterUserUseCase {
 
     private final UserRepositoryPort userRepository;

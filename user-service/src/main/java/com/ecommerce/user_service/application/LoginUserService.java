@@ -5,8 +5,10 @@ import com.ecommerce.user_service.domain.ports.in.LoginUserCommand;
 import com.ecommerce.user_service.domain.ports.in.LoginUserUseCase;
 import com.ecommerce.user_service.domain.ports.out.PasswordEncoderPort;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class LoginUserService implements LoginUserUseCase {
 
     private final UserRepositoryPort userRepository;

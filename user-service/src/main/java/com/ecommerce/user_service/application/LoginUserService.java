@@ -5,7 +5,7 @@ import com.ecommerce.user_service.domain.ports.in.LoginUserCommand;
 import com.ecommerce.user_service.domain.ports.in.LoginUserUseCase;
 import com.ecommerce.user_service.domain.ports.out.PasswordEncoderPort;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 public class LoginUserService implements LoginUserUseCase {
 
@@ -18,7 +18,7 @@ public class LoginUserService implements LoginUserUseCase {
     }
 
     @Override
-    @Transactional()
+    @Transactional(readOnly = true)
     public User execute(LoginUserCommand command) {
         User user = userRepository.findByEmail(command.email())
                 .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas"));

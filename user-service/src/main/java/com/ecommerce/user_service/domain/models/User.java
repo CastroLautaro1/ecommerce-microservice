@@ -84,6 +84,13 @@ public class User {
         this.paymentMethods.add(paymentMethod);
     }
 
+    public void deactivate() {
+        if (!this.active) {
+            throw new IllegalStateException("El usuario ya se encuentra desactivado");
+        }
+        this.active = false;
+    }
+
     // GETTERS
     public Long getId() { return id; }
 

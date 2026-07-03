@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.application;
 
+import com.ecommerce.user_service.domain.exceptions.UserAlreadyExistsException;
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.RegisterUserCommand;
 import com.ecommerce.user_service.domain.ports.in.RegisterUserUseCase;
@@ -23,10 +24,10 @@ public class RegisterUserService implements RegisterUserUseCase {
     @Transactional
     public Long execute(RegisterUserCommand command) {
         if (userRepository.existsByEmail(command.email())) {
-            throw new IllegalArgumentException("El email ya está registrado");
+            throw new UserAlreadyExistsException("Este correo electrónico ya se encuentra registrado. Por favor, inicia sesión.");
         }
         if (userRepository.existsByUsername(command.username())) {
-            throw new IllegalArgumentException("El nombre de usuario ya está en uso");
+            throw new UserAlreadyExistsException("El nombre de usuario ya está en uso. Por favor, elige otro.");
         }
 
         String hashedPassword = passwordEncoder.encode(command.rawPassword());

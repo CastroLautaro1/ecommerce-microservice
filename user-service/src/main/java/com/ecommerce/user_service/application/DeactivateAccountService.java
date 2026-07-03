@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.application;
 
+import com.ecommerce.user_service.domain.exceptions.UserNotFoundException;
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.DeactivateAccountUseCase;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
@@ -19,7 +20,7 @@ public class DeactivateAccountService implements DeactivateAccountUseCase {
     @Transactional
     public void execute(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
 
         user.deactivate();
 

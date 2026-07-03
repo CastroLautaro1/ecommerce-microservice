@@ -1,5 +1,8 @@
 package com.ecommerce.user_service.application;
 
+import com.ecommerce.user_service.domain.exceptions.AccountDeactivatedException;
+import com.ecommerce.user_service.domain.exceptions.InvalidCredentialsException;
+import com.ecommerce.user_service.domain.exceptions.UserNotFoundException;
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.LoginUserCommand;
 import com.ecommerce.user_service.domain.ports.in.LoginUserUseCase;
@@ -23,14 +26,14 @@ public class LoginUserService implements LoginUserUseCase {
     @Transactional(readOnly = true)
     public User execute(LoginUserCommand command) {
         User user = userRepository.findByEmail(command.email())
-                .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas"));
+                .orElseThrow(() -> new UserNotFoundException(command.email()));
 
         if (!user.isActive()) {
-            throw new IllegalStateException("La cuenta está desactivada. Contacte a soporte.");
+            throw new AccountDeactivatedException("La cuenta está desactivada. Contacte a soporte.");
         }
 
         if (!passwordEncoder.matches(command.rawPassword(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("Credenciales inválidas");
+            throw new InvalidCredentialsException();
         }
 
         return user;

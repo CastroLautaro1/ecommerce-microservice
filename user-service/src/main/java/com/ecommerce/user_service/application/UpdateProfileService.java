@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.application;
 
+import com.ecommerce.user_service.domain.exceptions.UserNotFoundException;
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.UpdateProfileCommand;
 import com.ecommerce.user_service.domain.ports.in.UpdateProfileUseCase;
@@ -20,7 +21,7 @@ public class UpdateProfileService implements UpdateProfileUseCase {
     @Transactional
     public void execute(UpdateProfileCommand command) {
         User user = userRepository.findById(command.userId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(command.userId()));
 
         user.completeProfile(command.personalInfo(), command.taxStatus());
 

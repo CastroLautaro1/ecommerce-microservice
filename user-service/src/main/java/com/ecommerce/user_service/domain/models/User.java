@@ -1,5 +1,8 @@
 package com.ecommerce.user_service.domain.models;
 
+import com.ecommerce.user_service.domain.exceptions.AccountDeactivatedException;
+import com.ecommerce.user_service.domain.exceptions.DomainValidationException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,76 +21,124 @@ public class User {
     private LocalDateTime createdAt;
 
     public User(String username, String email, String passwordHash) {
-        this.username = username;
-        this.email = email;
-        this.passwordHash = passwordHash;
+        validateRegistrationData(username, email, passwordHash);
+
+        this.username = username.trim();
+        this.email = email.trim().toLowerCase(); // Guardamos el email siempre en minúsculas
+        this.passwordHash = passwordHash.trim();
         this.role = Role.USER;
         this.active = true;
         this.createdAt = LocalDateTime.now();
     }
 
+    public User(Long id, String username, String email, String passwordHash, Role role,
+                PersonalInfo personalInfo, TaxStatus taxStatus, List<Address> addresses,
+                List<SavedPaymentMethod> paymentMethods, boolean active, LocalDateTime createdAt) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.personalInfo = personalInfo;
+        this.taxStatus = taxStatus;
+        if (addresses != null) this.addresses = addresses;
+        if (paymentMethods != null) this.paymentMethods = paymentMethods;
+        this.active = active;
+        this.createdAt = createdAt;
+    }
+
     // --- REGLAS DE NEGOCIO (COMPORTAMIENTO) ---
 
+    private void validateRegistrationData(String username, String email, String passwordHash) {
+        if (username == null || username.isBlank() || username.length() < 3 || username.length() > 30) {
+            throw new DomainValidationException("El nombre de usuario es obligatorio y debe tener entre 3 y 30 caracteres");
+        }
+
+        if (email == null || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+            throw new DomainValidationException("El formato del correo electrónico es inválido");
+        }
+        this.email = email.toLowerCase().trim();
+
+        if (passwordHash == null || passwordHash.isBlank()) {
+            throw new DomainValidationException("El hash de la contraseña es obligatorio");
+        }
+    }
+
     public void completeProfile(PersonalInfo info, TaxStatus taxStatus) {
+        ensureAccountIsActive();
+        if (info == null) throw new DomainValidationException("La información personal no puede ser nula");
+        if (taxStatus == null) throw new DomainValidationException("El estado fiscal no puede ser nulo");
+
         this.personalInfo = info;
         this.taxStatus = taxStatus;
     }
 
     public void addAddress(Address address) {
-        if (this.addresses.isEmpty()) {
-            address.setDefault(true);
+        ensureAccountIsActive();
+        if (address == null) throw new DomainValidationException("La dirección no puede ser nula");
+        if (this.addresses.size() >= 8) {
+            throw new DomainValidationException("Límite de direcciones de envío excedido (Máximo 8)");
         }
+
+        // Si la nueva es default, desmarcamos las demás
+        if (address.isDefault() || this.addresses.isEmpty()) {
+            address.setDefault(true);
+            this.addresses.forEach(a -> a.setDefault(false));
+        }
+
         this.addresses.add(address);
     }
 
     public void addPaymentMethod(SavedPaymentMethod paymentMethod) {
+        ensureAccountIsActive();
+        if (paymentMethod == null) throw new DomainValidationException("El método de pago no puede ser nulo");
         if (this.paymentMethods.size() >= 5) {
-            throw new IllegalStateException("Límite de tarjetas guardadas excedido");
+            throw new DomainValidationException("Límite de tarjetas guardadas excedido (Máximo 5)");
         }
+
+        // Si la nueva es default, desmarcamos las demás
+        if (paymentMethod.isDefault() || this.paymentMethods.isEmpty()) {
+            paymentMethod.setDefault(true);
+            this.paymentMethods.forEach(p -> p.setDefault(false));
+        }
+
         this.paymentMethods.add(paymentMethod);
     }
 
-    public Long getId() {
-        return id;
+    public void deactivate() {
+        if (!this.active) {
+            throw new AccountDeactivatedException("El usuario ya se encuentra desactivado");
+        }
+        this.active = false;
     }
 
-    public String getUsername() {
-        return username;
+    // Método auxiliar privado
+    private void ensureAccountIsActive() {
+        if (!this.active) {
+            throw new AccountDeactivatedException("La operación no puede realizarse porque la cuenta está desactivada");
+        }
     }
 
-    public String getEmail() {
-        return email;
-    }
+    // GETTERS
+    public Long getId() { return id; }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
+    public String getUsername() { return username; }
 
-    public Role getRole() {
-        return role;
-    }
+    public String getEmail() { return email; }
 
-    public PersonalInfo getPersonalInfo() {
-        return personalInfo;
-    }
+    public String getPasswordHash() { return passwordHash; }
 
-    public TaxStatus getTaxStatus() {
-        return taxStatus;
-    }
+    public Role getRole() { return role; }
 
-    public List<Address> getAddresses() {
-        return addresses;
-    }
+    public PersonalInfo getPersonalInfo() { return personalInfo; }
 
-    public List<SavedPaymentMethod> getPaymentMethods() {
-        return paymentMethods;
-    }
+    public TaxStatus getTaxStatus() { return taxStatus; }
 
-    public boolean isActive() {
-        return active;
-    }
+    public List<Address> getAddresses() { return addresses; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public List<SavedPaymentMethod> getPaymentMethods() { return paymentMethods; }
+
+    public boolean isActive() { return active; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }

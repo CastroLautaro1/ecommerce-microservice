@@ -1,5 +1,7 @@
 package com.ecommerce.user_service.domain.models;
 
+import java.util.UUID;
+
 public class SavedPaymentMethod {
     private String id;
     private String token; // El token seguro del procesador de pagos
@@ -7,11 +9,13 @@ public class SavedPaymentMethod {
     private String lastFourDigits; // "4242"
     private boolean isDefault;
 
-    public SavedPaymentMethod(String token, String cardBrand, String lastFourDigits, boolean isDefault) {
-        this.token = token;
-        this.cardBrand = cardBrand;
-        this.lastFourDigits = lastFourDigits;
-        this.isDefault = isDefault;
+    public SavedPaymentMethod(String token, String cardBrand, String lastFourDigits) {
+        validate(token, cardBrand, lastFourDigits);
+        this.id = UUID.randomUUID().toString();
+        this.token = token.trim();
+        this.cardBrand = cardBrand.trim().toUpperCase();
+        this.lastFourDigits = lastFourDigits.trim();
+        this.isDefault = false;
     }
 
     public SavedPaymentMethod(String id, String token, String cardBrand, String lastFourDigits, boolean isDefault) {
@@ -22,8 +26,24 @@ public class SavedPaymentMethod {
         this.isDefault = isDefault;
     }
 
-    // --- Agregar validacionaes de dominio
+    private void validate(String token, String cardBrand, String lastFourDigits) {
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException("El token del procesador de pagos es obligatorio");
+        }
+        if (cardBrand == null || cardBrand.isBlank()) {
+            throw new IllegalArgumentException("La marca de la tarjeta (cardBrand) es obligatoria");
+        }
+        // Deben ser exactamente 4 dígitos numéricos
+        if (lastFourDigits == null || !lastFourDigits.matches("^\\d{4}$")) {
+            throw new IllegalArgumentException("Deben ingresarse exactamente los últimos 4 dígitos numéricos de la tarjeta");
+        }
+    }
 
+    public void setDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    // GETTERS
 
     public String getId() {
         return id;
@@ -43,21 +63,5 @@ public class SavedPaymentMethod {
 
     public boolean isDefault() {
         return isDefault;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public void setCardBrand(String cardBrand) {
-        this.cardBrand = cardBrand;
-    }
-
-    public void setLastFourDigits(String lastFourDigits) {
-        this.lastFourDigits = lastFourDigits;
-    }
-
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
     }
 }

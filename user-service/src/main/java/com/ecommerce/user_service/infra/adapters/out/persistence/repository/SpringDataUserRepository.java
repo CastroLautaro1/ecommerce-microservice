@@ -14,4 +14,7 @@ public interface SpringDataUserRepository extends JpaRepository<UserJpaEntity, L
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    boolean existsByPersonalInfo_DocumentNumberAndIdNot(String documentNumber, Long userId);
+    boolean existsByPersonalInfo_PhoneNumberAndIdNot(String phoneNumber, Long userId);
 }

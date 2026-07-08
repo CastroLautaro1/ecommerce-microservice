@@ -52,4 +52,14 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public boolean existsByUsername(String username) {
         return jpaRepository.existsByUsername(username);
     }
+
+    @Override
+    public boolean existsByDocumentNumberAndIdNot(String documentNumber, Long userId) {
+        return jpaRepository.existsByPersonalInfo_DocumentNumberAndIdNot(documentNumber, userId);
+    }
+
+    @Override
+    public boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long userId) {
+        return jpaRepository.existsByPersonalInfo_PhoneNumberAndIdNot(phoneNumber, userId);
+    }
 }

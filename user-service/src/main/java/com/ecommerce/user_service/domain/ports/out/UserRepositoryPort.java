@@ -17,4 +17,6 @@ public interface UserRepositoryPort {
     // Para Registro (validar que no haya duplicados)
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+    boolean existsByDocumentNumberAndIdNot(String documentNumber, Long userId);
+    boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long userId);
 }

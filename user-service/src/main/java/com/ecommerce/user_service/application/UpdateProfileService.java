@@ -37,7 +37,7 @@ public class UpdateProfileService implements UpdateProfileUseCase {
             throw new UserAlreadyExistsException("El número de teléfono ya se encuentra registrado por otro usuario");
         }
 
-        user.completeProfile(command.personalInfo(), command.taxStatus());
+        user.updateProfile(command.personalInfo(), command.taxStatus());
 
         userRepository.save(user);
     }

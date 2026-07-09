@@ -20,13 +20,15 @@ public class User {
     private boolean active;
     private LocalDateTime createdAt;
 
-    public User(String username, String email, String passwordHash) {
+    // Constructor usado para el Registro
+    public User(String username, String email, String passwordHash, String firstName, String lastName) {
         validateRegistrationData(username, email, passwordHash);
 
         this.username = username.trim();
         this.email = email.trim().toLowerCase(); // Guardamos el email siempre en minúsculas
         this.passwordHash = passwordHash.trim();
         this.role = Role.USER;
+        this.personalInfo = new PersonalInfo(firstName, lastName, null, null);
         this.active = true;
         this.createdAt = LocalDateTime.now();
     }
@@ -64,13 +66,34 @@ public class User {
         }
     }
 
-    public void completeProfile(PersonalInfo info, TaxStatus taxStatus) {
+    public void updateProfile(PersonalInfo info, TaxStatus taxStatus) {
         ensureAccountIsActive();
-        if (info == null) throw new DomainValidationException("La información personal no puede ser nula");
-        if (taxStatus == null) throw new DomainValidationException("El estado fiscal no puede ser nulo");
+        if (info == null) {
+            throw new DomainValidationException("La información personal no puede ser nula");
+        }
+
+        // Verificamos si el usuario YA tenía un DNI registrado en la base de datos
+        if (this.personalInfo != null && this.personalInfo.isDocumentNumberComplete()) {
+            String existingDni = this.personalInfo.documentNumber();
+            String incomingDni = info.documentNumber();
+
+            // Si el cliente intenta enviar un DNI nuevo y diferente al que ya tenia se arroja una excepcion
+            if (incomingDni != null && !incomingDni.isBlank() && !existingDni.equals(incomingDni)) {
+                throw new DomainValidationException("El número de documento no puede ser modificado una vez registrado.");
+            }
+
+            if (incomingDni == null || incomingDni.isBlank()) {
+                info = new PersonalInfo(
+                        info.firstName(),
+                        info.lastName(),
+                        existingDni, // Rescatamos el DNI inmutable
+                        info.phoneNumber()
+                );
+            }
+        }
 
         this.personalInfo = info;
-        this.taxStatus = taxStatus;
+        this.taxStatus = taxStatus != null ? taxStatus : this.taxStatus;
     }
 
     public void addAddress(Address address) {

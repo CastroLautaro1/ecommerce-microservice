@@ -32,14 +32,15 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
         RegisterUserCommand command = new RegisterUserCommand(
-                request.username(),
+                request.firstName(),
+                request.lastName(),
                 request.email(),
                 request.password()
         );
         Long newUserId = registerUserUseCase.execute(command);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new UserResponse(newUserId, request.username(), request.email()));
+                .body(new UserResponse(newUserId, request.firstName(), request.lastName(), request.email()));
     }
 
     @PostMapping("/login")
@@ -51,7 +52,8 @@ public class UserController {
         // En el futuro se tendria que devolver el token jwt, de momento solo devuelvo los datos del usuario
         return ResponseEntity.ok(new UserResponse(
                 loggedInUser.getId(),
-                loggedInUser.getUsername(),
+                loggedInUser.getPersonalInfo().firstName(),
+                loggedInUser.getPersonalInfo().lastName(),
                 loggedInUser.getEmail()
         ));
     }

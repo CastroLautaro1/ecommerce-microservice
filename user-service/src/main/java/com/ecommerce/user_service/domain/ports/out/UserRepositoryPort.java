@@ -13,6 +13,7 @@ public interface UserRepositoryPort {
 
     // Para Edición y Baja Lógica (buscar al usuario autenticado)
     Optional<User> findById(Long id);
+    Optional<User> findActiveById(Long id);
 
     // Para Registro (validar que no haya duplicados)
     boolean existsByEmail(String email);

@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.application;
 
+import com.ecommerce.user_service.domain.exceptions.UserAlreadyExistsException;
 import com.ecommerce.user_service.domain.exceptions.UserNotFoundException;
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.UpdateProfileCommand;
@@ -23,7 +24,20 @@ public class UpdateProfileService implements UpdateProfileUseCase {
         User user = userRepository.findById(command.userId())
                 .orElseThrow(() -> new UserNotFoundException(command.userId()));
 
-        user.completeProfile(command.personalInfo(), command.taxStatus());
+        String newDni = command.personalInfo().documentNumber();
+        String newPhone = command.personalInfo().phoneNumber();
+
+        // Validar que el DNI no esta tomado
+        if (newDni != null && userRepository.existsByDocumentNumberAndIdNot(newDni, command.userId())) {
+            throw new UserAlreadyExistsException("El número de documento ya se encuentra registrado por otro usuario");
+        }
+
+        // Validar que el celular no este tomado
+        if (newPhone != null && userRepository.existsByPhoneNumberAndIdNot(newPhone, command.userId())) {
+            throw new UserAlreadyExistsException("El número de teléfono ya se encuentra registrado por otro usuario");
+        }
+
+        user.updateProfile(command.personalInfo(), command.taxStatus());
 
         userRepository.save(user);
     }

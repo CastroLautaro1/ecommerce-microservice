@@ -10,8 +10,12 @@ import java.util.Optional;
 public interface SpringDataUserRepository extends JpaRepository<UserJpaEntity, Long> {
 
     Optional<UserJpaEntity> findByEmail(String email);
+    Optional<UserJpaEntity> findByIdAndActiveTrue(Long id);
 
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    boolean existsByPersonalInfo_DocumentNumberAndIdNot(String documentNumber, Long userId);
+    boolean existsByPersonalInfo_PhoneNumberAndIdNot(String phoneNumber, Long userId);
 }

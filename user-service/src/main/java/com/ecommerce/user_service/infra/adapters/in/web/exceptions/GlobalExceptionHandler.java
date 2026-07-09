@@ -44,6 +44,22 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN, request.getRequestURI());
     }
 
+    // 400 BAD REQUEST -> Errores de serializacion/deserializacion del JSON
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadable(
+            org.springframework.http.converter.HttpMessageNotReadableException ex,
+            HttpServletRequest request) {
+
+        // Spring busca automáticamente la causa más profunda (el DomainValidationException)
+        Throwable mostSpecificCause = ex.getMostSpecificCause();
+
+        if (mostSpecificCause.getClass().getPackageName().startsWith("com.ecommerce.user_service.domain")) {
+            return buildErrorResponse(mostSpecificCause.getMessage(), HttpStatus.BAD_REQUEST, request.getRequestURI());
+        }
+
+        return buildErrorResponse("El cuerpo de la petición (JSON) contiene un formato inválido", HttpStatus.BAD_REQUEST, request.getRequestURI());
+    }
+
     // Fallback para cualquier excepción no controlada -> 500 Internal Server Error
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex, HttpServletRequest request) {

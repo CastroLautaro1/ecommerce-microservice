@@ -44,6 +44,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public Optional<User> findActiveById(Long id) {
+        return jpaRepository.findByIdAndActiveTrue(id)
+                .map(mapper::toDomainModel);
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return jpaRepository.existsByEmail(email);
     }
@@ -51,5 +57,15 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public boolean existsByUsername(String username) {
         return jpaRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean existsByDocumentNumberAndIdNot(String documentNumber, Long userId) {
+        return jpaRepository.existsByPersonalInfo_DocumentNumberAndIdNot(documentNumber, userId);
+    }
+
+    @Override
+    public boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long userId) {
+        return jpaRepository.existsByPersonalInfo_PhoneNumberAndIdNot(phoneNumber, userId);
     }
 }

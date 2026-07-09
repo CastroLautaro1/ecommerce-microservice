@@ -1,7 +1,8 @@
 package com.ecommerce.user_service.infra.adapters.in.web.dto;
 
 public record RegisterRequest(
-        String username,
+        String firstName,
+        String lastName,
         String email,
         String password
 ) {

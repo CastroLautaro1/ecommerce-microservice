@@ -2,10 +2,7 @@ package com.ecommerce.user_service.infra.adapters.in.web;
 
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.*;
-import com.ecommerce.user_service.infra.adapters.in.web.dto.LoginRequest;
-import com.ecommerce.user_service.infra.adapters.in.web.dto.RegisterRequest;
-import com.ecommerce.user_service.infra.adapters.in.web.dto.UpdateProfileRequest;
-import com.ecommerce.user_service.infra.adapters.in.web.dto.UserResponse;
+import com.ecommerce.user_service.infra.adapters.in.web.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,15 +15,18 @@ public class UserController {
     private final LoginUserUseCase loginUserUseCase;
     private final UpdateProfileUseCase updateProfileUseCase;
     private final DeactivateAccountUseCase deactivateAccountUseCase;
+    private final UserQueryUseCases userQueryUseCases;
 
     public UserController(RegisterUserUseCase registerUserUseCase,
                           LoginUserUseCase loginUserUseCase,
                           UpdateProfileUseCase updateProfileUseCase,
-                          DeactivateAccountUseCase deactivateAccountUseCase) {
+                          DeactivateAccountUseCase deactivateAccountUseCase,
+                          UserQueryUseCases userQueryUseCases) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUserUseCase = loginUserUseCase;
         this.updateProfileUseCase = updateProfileUseCase;
         this.deactivateAccountUseCase = deactivateAccountUseCase;
+        this.userQueryUseCases = userQueryUseCases;
     }
 
     @PostMapping("/register")
@@ -80,5 +80,13 @@ public class UserController {
 
         deactivateAccountUseCase.execute(authenticatedUserId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me/profile")
+    public ResponseEntity<UserProfileResponse> getProfile(@RequestHeader("X-User-Id") Long authenticatedUserId) {
+        User user = userQueryUseCases.getProfile(authenticatedUserId);
+
+        // Mapeamos el modelo de dominio al DTO de respuesta
+        return ResponseEntity.ok(UserProfileResponse.fromDomain(user));
     }
 }

@@ -17,4 +17,7 @@ public interface InventoryRepositoryPort {
 
     // Método ultra útil para buscar qué producto contiene una reserva específica al confirmar o cancelar
     Optional<Inventory> findByReservationId(UUID reservationId);
+
+    // Busqueda con bloqueo pesimista para operaciones transaccionales crriticas
+    Optional<Inventory> findByProductIdWithLock(Long productId);
 }

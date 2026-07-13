@@ -7,6 +7,7 @@ import com.ecommerce.inventory_service.domain.ports.in.ReserveStockCommand;
 import com.ecommerce.inventory_service.domain.ports.in.ReserveStockUseCase;
 import com.ecommerce.inventory_service.domain.ports.out.InventoryRepositoryPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -25,6 +26,7 @@ public class ReserveStockService implements ReserveStockUseCase {
     }
 
     @Override
+    @Transactional
     public UUID execute(ReserveStockCommand command) {
         // Buscamos el inventario usando el puerto con bloqueo pesimista
         Inventory inventory = inventoryRepository.findByProductIdWithLock(command.productId())

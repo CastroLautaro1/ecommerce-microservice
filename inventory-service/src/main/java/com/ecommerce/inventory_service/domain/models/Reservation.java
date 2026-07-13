@@ -30,6 +30,16 @@ public class Reservation {
         this.expiresAt = expiresAt;
     }
 
+    // Constructor de reconstrucción (Usado exclusivamente por el Mapeador de Infraestructura)
+    public Reservation(UUID reservationId, Long orderId, int quantity, ReservationStatus status, Instant createdAt, Instant expiresAt) {
+        this.reservationId = reservationId;
+        this.orderId = orderId;
+        this.quantity = quantity;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
+    }
+
     // Comportamientos de cambio de estado protegidos
     public void confirm() {
         ensureIsActive();
@@ -63,5 +73,6 @@ public class Reservation {
     public Long getOrderId() { return orderId; }
     public int getQuantity() { return quantity; }
     public ReservationStatus getStatus() { return status; }
+    public Instant getCreatedAt() { return createdAt; }
     public Instant getExpiresAt() { return expiresAt; }
 }

@@ -10,6 +10,7 @@ import com.ecommerce.order_service.domain.ports.out.CatalogClientPort;
 import com.ecommerce.order_service.domain.ports.out.InventoryClientPort;
 import com.ecommerce.order_service.domain.ports.out.OrderRepositoryPort;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
+@Service
 public class CreateOrderService implements CreateOrderUseCase {
 
     private final OrderRepositoryPort orderRepository;

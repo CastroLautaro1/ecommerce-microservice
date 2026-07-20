@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public class Reservation {
     private final UUID reservationId;
-    private final Long orderId;
+    private final UUID orderId;
     private final int quantity;
     private ReservationStatus status;
     private final Instant createdAt;
     private final Instant expiresAt;
 
-    public Reservation(UUID reservationId, Long orderId, int quantity, Instant expiresAt) {
+    public Reservation(UUID reservationId, UUID orderId, int quantity, Instant expiresAt) {
         if (reservationId == null) throw new DomainValidationException("El ID de la reserva es obligatorio");
         if (orderId == null) throw new DomainValidationException("El ID de la orden es obligatorio");
         if (quantity <= 0) throw new DomainValidationException("La cantidad a reservar debe ser mayor a cero");
@@ -31,7 +31,7 @@ public class Reservation {
     }
 
     // Constructor de reconstrucción (Usado exclusivamente por el Mapeador de Infraestructura)
-    public Reservation(UUID reservationId, Long orderId, int quantity, ReservationStatus status, Instant createdAt, Instant expiresAt) {
+    public Reservation(UUID reservationId, UUID orderId, int quantity, ReservationStatus status, Instant createdAt, Instant expiresAt) {
         this.reservationId = reservationId;
         this.orderId = orderId;
         this.quantity = quantity;
@@ -70,7 +70,7 @@ public class Reservation {
 
     // Getters imprescindibles para el Agregado
     public UUID getReservationId() { return reservationId; }
-    public Long getOrderId() { return orderId; }
+    public UUID getOrderId() { return orderId; }
     public int getQuantity() { return quantity; }
     public ReservationStatus getStatus() { return status; }
     public Instant getCreatedAt() { return createdAt; }

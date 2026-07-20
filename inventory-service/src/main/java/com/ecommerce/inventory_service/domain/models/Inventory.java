@@ -45,7 +45,7 @@ public class Inventory {
 
      // 1. RESERVAR STOCK: Se llama cuando el cliente le da al botón "Comprar".
      // Bloquea temporalmente las unidades para que nadie más pueda llevárselas.
-    public Reservation reserve(UUID reservationId, Long orderId, int quantity, Instant expiresAt) {
+    public Reservation reserve(UUID reservationId, UUID orderId, int quantity, Instant expiresAt) {
         if (quantity <= 0) {
             throw new DomainValidationException("La cantidad a reservar debe ser mayor a cero");
         }

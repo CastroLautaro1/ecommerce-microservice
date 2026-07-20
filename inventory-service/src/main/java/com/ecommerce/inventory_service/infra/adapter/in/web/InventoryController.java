@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/inventories")
@@ -51,15 +52,16 @@ public class InventoryController {
     public ResponseEntity<ReservationResponse> reserveStock(@RequestBody ReserveStockRequest request) {
         ReserveStockCommand command = new ReserveStockCommand(
                 request.orderId(),
-                request.productId(),
-                request.quantity()
+                request.items().stream()
+                        .map(i -> new ItemReservationCommand(i.productId(), i.quantity()))
+                        .collect(Collectors.toUnmodifiableList())
         );
 
         UUID reservationId = reserveStockUseCase.execute(command);
 
         ReservationResponse response = new ReservationResponse(
                 reservationId,
-                "Stock reservado con éxito por 15 minutos."
+                "Stock reservado con éxito por 15 minutos. Pendiente de confirmación de pago."
         );
 
         return ResponseEntity.ok(response);

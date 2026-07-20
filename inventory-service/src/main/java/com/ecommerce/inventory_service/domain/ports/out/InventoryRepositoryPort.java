@@ -2,11 +2,13 @@ package com.ecommerce.inventory_service.domain.ports.out;
 
 import com.ecommerce.inventory_service.domain.models.Inventory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface InventoryRepositoryPort {
     Inventory save(Inventory inventory);
+    void saveAll(List<Inventory> inventories);
 
     Optional<Inventory> findById(Long id);
 

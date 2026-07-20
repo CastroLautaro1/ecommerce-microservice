@@ -7,6 +7,7 @@ import com.ecommerce.inventory_service.infra.adapter.out.persistence.mapper.Inve
 import com.ecommerce.inventory_service.infra.adapter.out.persistence.repository.SpringDataInventoryRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +27,15 @@ public class InventoryRepositoryAdapter implements InventoryRepositoryPort {
         InventoryJpaEntity jpaEntity = inventoryMapper.toJpaEntity(inventory);
         InventoryJpaEntity savedEntity = springDataRepository.save(jpaEntity);
         return inventoryMapper.toDomain(savedEntity);
+    }
+
+    @Override
+    public void saveAll(List<Inventory> inventories) {
+        List<InventoryJpaEntity> entities = inventories.stream()
+                .map(inventoryMapper::toJpaEntity)
+                .toList();
+
+        springDataRepository.saveAll(entities);
     }
 
     @Override

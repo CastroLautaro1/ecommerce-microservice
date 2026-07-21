@@ -61,10 +61,8 @@ public class CreateOrderService implements CreateOrderUseCase {
         Order order = new Order(command.orderId(), command.userId(), items);
 
         // Se reserva la cantidad correspondiente de cada producto
-        UUID reservationId;
         try {
-            reservationId = inventoryClient.reserveStock(order.getOrderId(), order.getItems());
-            order.attachInventoryReservation(reservationId);
+            inventoryClient.reserveStock(order.getOrderId(), order.getItems());
         } catch (Exception ex) {
             log.error("Fallo al reservar stock para la orden {}: {}", order.getOrderId(), ex.getMessage());
             // Si el inventario falla, abortamos todo. No hay estado local que revertir aún.
@@ -78,11 +76,11 @@ public class CreateOrderService implements CreateOrderUseCase {
             // Si la transaccion falla entonces se debe liberar el stock reservado en el Inventory Service
             log.error("Fallo al guardar la orden local {}. Ejecutando compensación...", order.getOrderId());
             try {
-                inventoryClient.cancelReservation(reservationId);
-                log.info("Compensación exitosa: Reserva {} cancelada.", reservationId);
+                inventoryClient.cancelReservation(order.getOrderId());
+                log.info("Compensación exitosa: Todas las reservas para la orden {} fueron canceladas.", order.getOrderId());
             } catch (Exception compensationEx) {
                 // Si no se puede liberar ese Stock entonces se tendra que hacer de forma manual
-                log.error("FALLO CRÍTICO DE COMPENSACIÓN. Reserva {} requiere cancelación manual.", reservationId, compensationEx);
+                log.error("FALLO CRÍTICO DE COMPENSACIÓN. Las reservas para la orden {} requieren expiración automática o intervención manual.", order.getOrderId(), compensationEx);
             }
             throw new RuntimeException("Error interno al persistir la orden. Transacción abortada.");
         }

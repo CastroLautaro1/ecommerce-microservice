@@ -26,7 +26,11 @@ public class InventoryJpaEntity {
     private int availableStock;
 
     // Un producto puede tener muchas reservas históricas o activas
-    @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "inventory",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            fetch = FetchType.LAZY
+    )
     private List<ReservationJpaEntity> reservations = new ArrayList<>();
 
     public InventoryJpaEntity() {}

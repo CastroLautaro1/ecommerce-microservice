@@ -3,6 +3,7 @@ package com.ecommerce.inventory_service.application;
 import com.ecommerce.inventory_service.domain.exceptions.InventoryNotFoundException;
 import com.ecommerce.inventory_service.domain.models.Inventory;
 import com.ecommerce.inventory_service.domain.models.Reservation;
+import com.ecommerce.inventory_service.domain.ports.in.ItemReservationCommand;
 import com.ecommerce.inventory_service.domain.ports.in.ReserveStockCommand;
 import com.ecommerce.inventory_service.domain.ports.in.ReserveStockUseCase;
 import com.ecommerce.inventory_service.domain.ports.out.InventoryRepositoryPort;
@@ -11,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,26 +32,40 @@ public class ReserveStockService implements ReserveStockUseCase {
     @Override
     @Transactional
     public UUID execute(ReserveStockCommand command) {
-        // Buscamos el inventario usando el puerto con bloqueo pesimista
-        Inventory inventory = inventoryRepository.findByProductIdWithLock(command.productId())
-                .orElseThrow(() -> new InventoryNotFoundException(command.productId()));
+        //  Ordenamos los items por productId de menor a mayor para prevenir un Deadlock
+        List<ItemReservationCommand> sortedItems = command.items().stream()
+                .sorted(Comparator.comparing(ItemReservationCommand::productId))
+                .toList();
 
-        // Se genera el identificador único de la nueva reserva y su fecha de expiración
-        UUID reservationId = UUID.randomUUID();
+        // Los productos reservados van a compartir un mismo orderId
+        UUID globalOrderId = command.orderId();
         Instant expiresAt = Instant.now().plus(RESERVATION_EXPIRATION_MINUTES, ChronoUnit.MINUTES);
 
-        // El Dominio maneja la logica matematica y valida el stock disponible
-        // Si no hay stock se arroja una excepcion y la transaccion hace un rollback
-        Reservation reservation = inventory.reserve(
-                reservationId,
-                command.orderId(),
-                command.quantity(),
-                expiresAt
-        );
+        // Unit work en memoria que recopila los inventarios a los que accedemos, para luego actualizarlos todos juntos
+        List<Inventory> mutatedInventories = new ArrayList<>();
 
-        inventoryRepository.save(inventory);
+        for (ItemReservationCommand item : sortedItems) {
+            Inventory inventory = inventoryRepository.findByProductIdWithLock(item.productId())
+                    .orElseThrow(() -> new InventoryNotFoundException(item.productId()));
 
-        // Retorna el UUID para que el servicio de ordenes sepa con qué ID quedo bloqueado su stock
-        return reservation.getReservationId();
+            UUID itemReservationId = UUID.randomUUID();
+
+            // Creamos la reserva correspondiente para cada agregado
+            inventory.reserve(
+                    itemReservationId,
+                    globalOrderId,
+                    item.quantity(),
+                    expiresAt
+            );
+
+            // Agregamos el agregado modificado a nuestra lista
+            mutatedInventories.add(inventory);
+        }
+
+        // Guardamos todo de una vez al final del flujo, asi se optimiza el batching de SQL
+        inventoryRepository.saveAll(mutatedInventories);
+
+        return globalOrderId;
     }
+
 }

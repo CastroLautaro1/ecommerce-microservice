@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +17,9 @@ public interface SpringDataInventoryRepository extends JpaRepository<InventoryJp
     Optional<InventoryJpaEntity> findByProductId(Long productId);
 
     Optional<InventoryJpaEntity> findBySku(String sku);
+
+    @Query("SELECT DISTINCT i FROM InventoryJpaEntity i JOIN i.reservations r WHERE r.orderId = :orderId")
+    List<InventoryJpaEntity> findByReservationsOrderId(@Param("orderId") UUID orderId);
 
     // Postgre agrega un FOR UPDATE al final del SQL, para que nadie mas pueda leer o escribir
     // sobre esta fila hasta que la transaccion termine

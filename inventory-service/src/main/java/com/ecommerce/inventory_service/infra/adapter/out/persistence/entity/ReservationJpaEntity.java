@@ -15,7 +15,7 @@ public class ReservationJpaEntity {
     private UUID reservationId;
 
     @Column(name = "order_id", nullable = false)
-    private Long orderId;
+    private UUID orderId;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
@@ -36,7 +36,7 @@ public class ReservationJpaEntity {
 
     public ReservationJpaEntity() {}
 
-    public ReservationJpaEntity(UUID reservationId, Long orderId, int quantity, ReservationStatus status, Instant createdAt, Instant expiresAt, InventoryJpaEntity inventory) {
+    public ReservationJpaEntity(UUID reservationId, UUID orderId, int quantity, ReservationStatus status, Instant createdAt, Instant expiresAt, InventoryJpaEntity inventory) {
         this.reservationId = reservationId;
         this.orderId = orderId;
         this.quantity = quantity;
@@ -54,11 +54,11 @@ public class ReservationJpaEntity {
         this.reservationId = reservationId;
     }
 
-    public Long getOrderId() {
+    public UUID getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(UUID orderId) {
         this.orderId = orderId;
     }
 

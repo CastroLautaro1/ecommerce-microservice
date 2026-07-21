@@ -7,8 +7,10 @@ import com.ecommerce.inventory_service.infra.adapter.out.persistence.mapper.Inve
 import com.ecommerce.inventory_service.infra.adapter.out.persistence.repository.SpringDataInventoryRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class InventoryRepositoryAdapter implements InventoryRepositoryPort {
@@ -29,9 +31,25 @@ public class InventoryRepositoryAdapter implements InventoryRepositoryPort {
     }
 
     @Override
+    public void saveAll(List<Inventory> inventories) {
+        List<InventoryJpaEntity> entities = inventories.stream()
+                .map(inventoryMapper::toJpaEntity)
+                .toList();
+
+        springDataRepository.saveAll(entities);
+    }
+
+    @Override
     public Optional<Inventory> findById(Long id) {
         return springDataRepository.findById(id)
                 .map(inventoryMapper::toDomain);
+    }
+
+    @Override
+    public List<Inventory> findInventoriesWithReservationsByOrderId(UUID orderId) {
+        return springDataRepository.findByReservationsOrderId(orderId).stream()
+                .map(inventoryMapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override

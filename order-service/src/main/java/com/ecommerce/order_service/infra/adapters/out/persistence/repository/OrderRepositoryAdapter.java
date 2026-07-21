@@ -50,7 +50,6 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
         }
         entity.setOrderId(order.getOrderId());
         entity.setUserId(order.getUserId());
-        entity.setReservationId(order.getReservationId());
         entity.setStatus(order.getStatus().name());
         entity.setCreatedAt(order.getCreatedAt());
         entity.setTotalAmount(order.getTotalAmount());
@@ -82,7 +81,6 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
                 entity.getId(),
                 entity.getOrderId(),
                 entity.getUserId(),
-                entity.getReservationId(),
                 OrderStatus.valueOf(entity.getStatus()),
                 entity.getCreatedAt(),
                 items

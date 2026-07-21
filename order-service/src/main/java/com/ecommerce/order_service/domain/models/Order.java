@@ -14,7 +14,6 @@ public class Order {
     private Long id;
     private final UUID orderId; // UUID para Idempotencia
     private final Long userId; // Id del comprador
-    private UUID reservationId; // UUID que devuelve el inventory-service
     private OrderStatus status;
     private final Instant createdAt;
     private final List<OrderItem> items;
@@ -35,11 +34,10 @@ public class Order {
     }
 
     // Constructor para reconstruccion desde la BdD
-    public Order(Long id, UUID orderId, Long userId, UUID reservationId, OrderStatus status, Instant createdAt, List<OrderItem> items) {
+    public Order(Long id, UUID orderId, Long userId, OrderStatus status, Instant createdAt, List<OrderItem> items) {
         this.id = id;
         this.orderId = orderId;
         this.userId = userId;
-        this.reservationId = reservationId;
         this.status = status;
         this.createdAt = createdAt;
         this.items = new ArrayList<>(items);
@@ -54,19 +52,9 @@ public class Order {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void attachInventoryReservation(UUID reservationId) {
-        if (this.reservationId != null) {
-            throw new InvalidOrderStateException("La orden ya tiene una reserva de inventario asociada");
-        }
-        this.reservationId = reservationId;
-    }
-
     public void confirm() {
         if (this.status != OrderStatus.PENDING) {
             throw new InvalidOrderStateException("Solo se puede confirmar una orden en estado PENDING");
-        }
-        if (this.reservationId == null) {
-            throw new InvalidOrderStateException("No se puede confirmar una orden sin una reserva de inventario válida");
         }
         this.status = OrderStatus.CONFIRMED;
     }
@@ -82,7 +70,6 @@ public class Order {
     public Long getId() { return id; }
     public UUID getOrderId() { return orderId; }
     public Long getUserId() { return userId; }
-    public UUID getReservationId() { return reservationId; }
     public OrderStatus getStatus() { return status; }
     public Instant getCreatedAt() { return createdAt; }
     public BigDecimal getTotalAmount() { return totalAmount; }

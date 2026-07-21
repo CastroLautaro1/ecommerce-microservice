@@ -10,6 +10,6 @@ public interface InventoryClientPort {
     UUID reserveStock(UUID orderId, List<OrderItem> items);
 
     // Transacciones compensatorias o de finalización
-    void confirmReservation(UUID reservationId);
-    void cancelReservation(UUID reservationId);
+    void confirmReservation(UUID orderId); // Confirma todas las reservas ligadas a una Orden
+    void cancelReservation(UUID orderId); // Cancela todas las reservas ligadas a una Orden
 }

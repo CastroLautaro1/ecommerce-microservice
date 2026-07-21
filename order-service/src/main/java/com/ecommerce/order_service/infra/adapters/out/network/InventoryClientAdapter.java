@@ -52,26 +52,26 @@ public class InventoryClientAdapter implements InventoryClientPort {
     }
 
     @Override
-    public void confirmReservation(UUID reservationId) {
+    public void confirmReservation(UUID orderId) {
         try {
-            log.debug("Confirmando reserva definitiva: {}", reservationId);
-            feignClient.confirmReservation(reservationId);
-            log.info("Reserva {} confirmada y descontada del stock físico.", reservationId);
+            log.debug("Confirmando reservas para la Orden: {}", orderId);
+            feignClient.confirmReservation(orderId);
+            log.info("Reserva/s para la Orden: {} confirmadas y descontadas del stock físico.", orderId);
         } catch (FeignException ex) {
-            log.error("Falla al confirmar la reserva {}. Detalle: {}", reservationId, ex.getMessage());
-            // En un sistema real esto requeriria encolamentie para reintentarlo de forma asincrona
+            log.error("Falla al confirmar las reservas de la Orden {}. Detalle: {}", orderId, ex.getMessage());
+            // En un sistema real esto requeriria encolamiento para reintentarlo de forma asincrona
             throw new RuntimeException("Falla de red al confirmar la reserva de inventario", ex);
         }
     }
 
     @Override
-    public void cancelReservation(UUID reservationId) {
+    public void cancelReservation(UUID orderId) {
         try {
-            log.info("Iniciando transacción compensatoria para revertir reserva: {}", reservationId);
-            feignClient.cancelReservation(reservationId);
-            log.info("Compensación exitosa. Stock liberado para la reserva: {}", reservationId);
+            log.info("Iniciando transacción compensatoria para revertir las reservas de la Orden: {}", orderId);
+            feignClient.cancelReservation(orderId);
+            log.info("Compensación exitosa. Stock liberado para las reservas de la Orden: {}", orderId);
         } catch (FeignException ex) {
-            log.error("ALERTA CRÍTICA Falla en compensación para reserva {}. Requiere intervención manual. Detalle: {}", reservationId, ex.getMessage());
+            log.error("ALERTA CRÍTICA Falla en compensación para las reservas de la Orden {}. Requiere intervención manual. Detalle: {}", orderId, ex.getMessage());
             throw new RuntimeException("Falla crítica en reversión de inventario", ex);
         }
     }

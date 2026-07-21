@@ -16,9 +16,17 @@ public interface InventoryFeignClient {
     @PostMapping("/api/v1/inventories/reserve")
     ReservationResponse reserveStock(@RequestBody StockReservationRequest request);
 
-    @PutMapping("/api/v1/inventories/reservations/{reservationId}/confirm")
-    void confirmReservation(@PathVariable("reservationId") UUID reservationId);
+    @PutMapping("/api/v1/reservations/orders/{orderId}/confirm")
+    void confirmReservation(@PathVariable("orderId") UUID orderId);
 
-    @PutMapping("/api/v1/inventories/reservations/{reservationId}/cancel")
-    void cancelReservation(@PathVariable("reservationId") UUID reservationId);
+    @PutMapping("/api/v1/reservations/orders/{orderId}/cancel")
+    void cancelReservation(@PathVariable("orderId") UUID orderId);
+
+//    @PutMapping("/api/v1/inventories/reservations/{reservationId}/confirm")
+//    void confirmReservation(@PathVariable("reservationId") UUID reservationId);
+//
+//    @PutMapping("/api/v1/inventories/reservations/{reservationId}/cancel")
+//    void cancelReservation(@PathVariable("reservationId") UUID reservationId);
+
+
 }

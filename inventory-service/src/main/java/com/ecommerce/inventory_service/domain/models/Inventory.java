@@ -43,7 +43,7 @@ public class Inventory {
 
     // --- COMPORTAMIENTOS DE NEGOCIO  ---
 
-     // 1. RESERVAR STOCK: Se llama cuando el cliente le da al botón "Comprar".
+     // RESERVAR STOCK: Se llama cuando el cliente le da al botón "Comprar".
      // Bloquea temporalmente las unidades para que nadie más pueda llevárselas.
     public Reservation reserve(UUID reservationId, UUID orderId, int quantity, Instant expiresAt) {
         if (quantity <= 0) {
@@ -63,7 +63,38 @@ public class Inventory {
         return newReservation;
     }
 
-     // 2. CONFIRMAR RESERVA: Llamado por un webhook o el Order-Service cuando el pago fue aprobado.
+    // Confirma todas las Reservas ligadas a una Orden
+    public void confirmReservationsForOrder(UUID orderId) {
+        List<Reservation> targetReservations = this.reservations.stream()
+                .filter(r -> r.getOrderId().equals(orderId))
+                .toList();
+
+        for (Reservation res : targetReservations) {
+            // Guardia de Dominio (Invariante del Agregado)
+            if (this.totalStock < res.getQuantity()) {
+                throw new InsufficientStockException(this.sku, res.getQuantity(), this.availableStock);
+            }
+            // Se reduce el stock fisico real porque la Orden ya fue confirmada
+            this.totalStock -= res.getQuantity();
+
+            res.confirm(); // El estado de la Reserva pasa a CONFIRMED
+        }
+    }
+
+    // Cancela todas las Reservas ligadas a una Orden
+    public void cancelReservationsForOrder(UUID orderId) {
+        List<Reservation> targetReservations = this.reservations.stream()
+                .filter(r -> r.getOrderId().equals(orderId))
+                .toList();
+
+        for (Reservation res : targetReservations) {
+            // La cancelación/compensación devuelve el stock para que pueda ser comprado por otro
+            this.availableStock += res.getQuantity();
+            res.cancel(); // El estado de la Reserva pasa a CANCELED
+        }
+    }
+
+     // CONFIRMAR RESERVA: Llamado por un webhook o el Order-Service cuando el pago fue aprobado.
      // El stock abandona definitivamente el almacén físico.
     public void confirmReservation(UUID reservationId) {
         Reservation reservation = findReservationById(reservationId);

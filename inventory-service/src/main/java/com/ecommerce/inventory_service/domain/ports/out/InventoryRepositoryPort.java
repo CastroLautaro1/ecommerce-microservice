@@ -12,6 +12,9 @@ public interface InventoryRepositoryPort {
 
     Optional<Inventory> findById(Long id);
 
+    // Trae los inventarios que contengan reservas ligadas a un orderId
+    List<Inventory> findInventoriesWithReservationsByOrderId(UUID orderId);
+
     // Vital para cuando el Order-Service mande el pedido con los IDs del producto
     Optional<Inventory> findByProductId(Long productId);
 

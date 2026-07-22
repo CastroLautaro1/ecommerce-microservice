@@ -53,15 +53,21 @@ public class Order {
     }
 
     public void confirm() {
-        if (this.status != OrderStatus.PENDING) {
-            throw new InvalidOrderStateException("Solo se puede confirmar una orden en estado PENDING");
+        if (this.status == OrderStatus.CANCELLED) {
+            throw new InvalidOrderStateException("No se puede confirmar una orden que ya ha sido cancelada.");
+        }
+        if (this.status == OrderStatus.CONFIRMED) {
+            return; // Idempotencia
         }
         this.status = OrderStatus.CONFIRMED;
     }
 
     public void cancel() {
         if (this.status == OrderStatus.CONFIRMED) {
-            throw new InvalidOrderStateException("No se puede cancelar una orden que ya fue confirmada y despachada");
+            throw new InvalidOrderStateException("No se puede cancelar una orden que ya ha sido confirmada.");
+        }
+        if (this.status == OrderStatus.CANCELLED) {
+            return; // Idempotencia
         }
         this.status = OrderStatus.CANCELLED;
     }

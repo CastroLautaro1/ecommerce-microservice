@@ -1,5 +1,8 @@
 package com.ecommerce.inventory_service.infra.adapter.in.web;
 
+import com.ecommerce.inventory_service.application.commands.CreateInventoryCommand;
+import com.ecommerce.inventory_service.application.commands.ItemReservationCommand;
+import com.ecommerce.inventory_service.application.commands.ReserveStockCommand;
 import com.ecommerce.inventory_service.domain.models.Inventory;
 import com.ecommerce.inventory_service.domain.ports.in.*;
 import com.ecommerce.inventory_service.infra.adapter.in.web.dto.CreateInventoryRequest;

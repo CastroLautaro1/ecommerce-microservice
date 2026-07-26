@@ -1,4 +1,4 @@
-package com.ecommerce.inventory_service.domain.ports.in;
+package com.ecommerce.inventory_service.application.commands;
 
 import java.util.List;
 import java.util.UUID;

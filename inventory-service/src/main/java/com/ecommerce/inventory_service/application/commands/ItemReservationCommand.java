@@ -1,4 +1,4 @@
-package com.ecommerce.inventory_service.domain.ports.in;
+package com.ecommerce.inventory_service.application.commands;
 
 public record ItemReservationCommand(
         Long productId,

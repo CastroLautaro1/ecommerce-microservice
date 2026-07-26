@@ -1,6 +1,5 @@
-package com.ecommerce.inventory_service.application;
+package com.ecommerce.inventory_service.application.services;
 
-import com.ecommerce.inventory_service.domain.exceptions.ReservationNotFoundException;
 import com.ecommerce.inventory_service.domain.models.Inventory;
 import com.ecommerce.inventory_service.domain.ports.in.ConfirmOrderReservationsUseCase;
 import com.ecommerce.inventory_service.domain.ports.out.InventoryRepositoryPort;

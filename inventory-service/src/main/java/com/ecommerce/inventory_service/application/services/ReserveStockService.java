@@ -1,10 +1,9 @@
-package com.ecommerce.inventory_service.application;
+package com.ecommerce.inventory_service.application.services;
 
 import com.ecommerce.inventory_service.domain.exceptions.InventoryNotFoundException;
 import com.ecommerce.inventory_service.domain.models.Inventory;
-import com.ecommerce.inventory_service.domain.models.Reservation;
-import com.ecommerce.inventory_service.domain.ports.in.ItemReservationCommand;
-import com.ecommerce.inventory_service.domain.ports.in.ReserveStockCommand;
+import com.ecommerce.inventory_service.application.commands.ItemReservationCommand;
+import com.ecommerce.inventory_service.application.commands.ReserveStockCommand;
 import com.ecommerce.inventory_service.domain.ports.in.ReserveStockUseCase;
 import com.ecommerce.inventory_service.domain.ports.out.InventoryRepositoryPort;
 import org.springframework.stereotype.Service;

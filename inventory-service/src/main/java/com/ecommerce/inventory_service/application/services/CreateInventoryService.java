@@ -1,8 +1,8 @@
-package com.ecommerce.inventory_service.application;
+package com.ecommerce.inventory_service.application.services;
 
 import com.ecommerce.inventory_service.domain.exceptions.DomainValidationException;
 import com.ecommerce.inventory_service.domain.models.Inventory;
-import com.ecommerce.inventory_service.domain.ports.in.CreateInventoryCommand;
+import com.ecommerce.inventory_service.application.commands.CreateInventoryCommand;
 import com.ecommerce.inventory_service.domain.ports.in.CreateInventoryUseCase;
 import com.ecommerce.inventory_service.domain.ports.out.InventoryRepositoryPort;
 import org.springframework.stereotype.Service;

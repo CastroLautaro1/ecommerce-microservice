@@ -1,4 +1,4 @@
-package com.ecommerce.catalog_service.domain.ports.in;
+package com.ecommerce.catalog_service.application.commands;
 
 import java.math.BigDecimal;
 import java.util.List;

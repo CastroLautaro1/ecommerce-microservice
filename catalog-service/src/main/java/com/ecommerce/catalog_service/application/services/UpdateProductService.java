@@ -1,9 +1,9 @@
-package com.ecommerce.catalog_service.application;
+package com.ecommerce.catalog_service.application.services;
 
 import com.ecommerce.catalog_service.domain.exceptions.ProductNotFoundException;
 import com.ecommerce.catalog_service.domain.models.Price;
 import com.ecommerce.catalog_service.domain.models.Product;
-import com.ecommerce.catalog_service.domain.ports.in.UpdateProductCommand;
+import com.ecommerce.catalog_service.application.commands.UpdateProductCommand;
 import com.ecommerce.catalog_service.domain.ports.in.UpdateProductUseCase;
 import com.ecommerce.catalog_service.domain.ports.out.ProductRepositoryPort;
 import jakarta.transaction.Transactional;

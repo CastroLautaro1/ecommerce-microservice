@@ -1,8 +1,8 @@
-package com.ecommerce.catalog_service.application;
+package com.ecommerce.catalog_service.application.services;
 
 import com.ecommerce.catalog_service.domain.models.Price;
 import com.ecommerce.catalog_service.domain.models.Product;
-import com.ecommerce.catalog_service.domain.ports.in.CreateProductCommand;
+import com.ecommerce.catalog_service.application.commands.CreateProductCommand;
 import com.ecommerce.catalog_service.domain.ports.in.CreateProductUseCase;
 import com.ecommerce.catalog_service.domain.ports.out.ProductRepositoryPort;
 import jakarta.transaction.Transactional;

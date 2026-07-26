@@ -1,4 +1,4 @@
-package com.ecommerce.catalog_service.domain.ports.in;
+package com.ecommerce.catalog_service.application.commands;
 
 public record DeactivateProductCommand(
         Long productId,

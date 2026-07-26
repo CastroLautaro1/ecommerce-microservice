@@ -1,4 +1,4 @@
-package com.ecommerce.catalog_service.application;
+package com.ecommerce.catalog_service.application.services;
 
 import com.ecommerce.catalog_service.domain.exceptions.ProductNotFoundException;
 import com.ecommerce.catalog_service.domain.models.Product;

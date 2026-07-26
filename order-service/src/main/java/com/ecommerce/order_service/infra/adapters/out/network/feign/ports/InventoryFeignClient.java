@@ -16,10 +16,10 @@ public interface InventoryFeignClient {
     @PostMapping("/api/v1/inventories/reserve")
     ReservationResponse reserveStock(@RequestBody StockReservationRequest request);
 
-    @PutMapping("/api/v1/reservations/orders/{orderId}/confirm")
+    @PutMapping("/api/v1/inventories/orders/{orderId}/confirm")
     void confirmReservation(@PathVariable("orderId") UUID orderId);
 
-    @PutMapping("/api/v1/reservations/orders/{orderId}/cancel")
+    @PutMapping("/api/v1/inventories/orders/{orderId}/cancel")
     void cancelReservation(@PathVariable("orderId") UUID orderId);
 
 //    @PutMapping("/api/v1/inventories/reservations/{reservationId}/confirm")

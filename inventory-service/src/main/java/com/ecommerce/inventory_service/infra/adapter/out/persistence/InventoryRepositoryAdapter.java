@@ -5,11 +5,14 @@ import com.ecommerce.inventory_service.domain.ports.out.InventoryRepositoryPort;
 import com.ecommerce.inventory_service.infra.adapter.out.persistence.entity.InventoryJpaEntity;
 import com.ecommerce.inventory_service.infra.adapter.out.persistence.mapper.InventoryMapper;
 import com.ecommerce.inventory_service.infra.adapter.out.persistence.repository.SpringDataInventoryRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,13 +33,40 @@ public class InventoryRepositoryAdapter implements InventoryRepositoryPort {
         return inventoryMapper.toDomain(savedEntity);
     }
 
+//    @Override
+//    public void saveAll(List<Inventory> inventories) {
+//        List<InventoryJpaEntity> entities = inventories.stream()
+//                .map(inventoryMapper::toJpaEntity)
+//                .toList();
+//
+//        springDataRepository.saveAll(entities);
+//    }
+
     @Override
-    public void saveAll(List<Inventory> inventories) {
-        List<InventoryJpaEntity> entities = inventories.stream()
-                .map(inventoryMapper::toJpaEntity)
+    @Transactional
+    public void saveAll(List<Inventory> inventoriesDomain) {
+        // Se extraen los IDs para buscar en bloque
+        List<Long> inventoryIds = inventoriesDomain.stream()
+                .map(Inventory::getId)
                 .toList();
 
-        springDataRepository.saveAll(entities);
+        // Se recuperan las entidades existentes
+        Map<Long, InventoryJpaEntity> existingEntities = springDataRepository.findAllById(inventoryIds)
+                .stream()
+                .collect(Collectors.toMap(InventoryJpaEntity::getId, Function.identity()));
+
+        for (Inventory domain : inventoriesDomain) {
+            InventoryJpaEntity jpaEntity = existingEntities.get(domain.getId());
+
+            if (jpaEntity != null) {
+                // Flujo de actualizacion
+                inventoryMapper.updateEntityFromDomain(jpaEntity, domain);
+            } else {
+                // Flujo de creacion
+                InventoryJpaEntity newEntity = inventoryMapper.toJpaEntity(domain);
+                springDataRepository.save(newEntity);
+            }
+        }
     }
 
     @Override

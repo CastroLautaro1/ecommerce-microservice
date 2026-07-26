@@ -60,6 +60,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGenericException(
             Exception ex,
             HttpServletRequest request) {
+        ex.printStackTrace();
+
         return buildErrorResponse("Ocurrió un error interno en el servidor",
                 HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI());
     }

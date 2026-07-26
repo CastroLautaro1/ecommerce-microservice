@@ -3,15 +3,14 @@ package com.ecommerce.order_service.infra.adapters.in.web;
 import com.ecommerce.order_service.application.commands.CreateOrderCommand;
 import com.ecommerce.order_service.application.commands.OrderItemCommand;
 import com.ecommerce.order_service.domain.models.Order;
+import com.ecommerce.order_service.domain.ports.in.CancelOrderUseCase;
+import com.ecommerce.order_service.domain.ports.in.ConfirmOrderUseCase;
 import com.ecommerce.order_service.domain.ports.in.CreateOrderUseCase;
 import com.ecommerce.order_service.infra.adapters.in.web.dto.CreateOrderRequest;
 import com.ecommerce.order_service.infra.adapters.in.web.dto.OrderResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,9 +20,13 @@ import java.util.stream.Collectors;
 public class OrderController {
 
     private final CreateOrderUseCase createOrderUseCase;
+    private final ConfirmOrderUseCase confirmOrderUseCase;
+    private final CancelOrderUseCase cancelOrderUseCase;
 
-    public OrderController(CreateOrderUseCase createOrderUseCase) {
+    public OrderController(CreateOrderUseCase createOrderUseCase, ConfirmOrderUseCase confirmOrderUseCase, CancelOrderUseCase cancelOrderUseCase) {
         this.createOrderUseCase = createOrderUseCase;
+        this.confirmOrderUseCase = confirmOrderUseCase;
+        this.cancelOrderUseCase = cancelOrderUseCase;
     }
 
     @PostMapping
@@ -43,5 +46,17 @@ public class OrderController {
         // 201 más DTO de respuesta
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new OrderResponse(order.getOrderId(), order.getStatus().name()));
+    }
+
+    @PutMapping("/{orderId}/confirm")
+    public ResponseEntity<Void> confirmOrder(@PathVariable UUID orderId) {
+        confirmOrderUseCase.execute(orderId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable UUID orderId) {
+        cancelOrderUseCase.execute(orderId);
+        return ResponseEntity.noContent().build();
     }
 }

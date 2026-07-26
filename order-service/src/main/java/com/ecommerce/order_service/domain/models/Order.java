@@ -53,18 +53,41 @@ public class Order {
     }
 
     public void confirm() {
+        if (this.status == OrderStatus.CONFIRMED) {
+            return; // Idempotencia: el sistema distribuido pudo enviar el evento dos veces
+        }
         if (this.status != OrderStatus.PENDING) {
-            throw new InvalidOrderStateException("Solo se puede confirmar una orden en estado PENDING");
+            throw new InvalidOrderStateException(
+                    String.format("Transición inválida. No se puede confirmar una orden en estado %s.", this.status)
+            );
         }
         this.status = OrderStatus.CONFIRMED;
     }
 
     public void cancel() {
-        if (this.status == OrderStatus.CONFIRMED) {
-            throw new InvalidOrderStateException("No se puede cancelar una orden que ya fue confirmada y despachada");
+        if (this.status == OrderStatus.CANCELLED) {
+            return; // Idempotencia
+        }
+        if (this.status != OrderStatus.PENDING) {
+            throw new InvalidOrderStateException(
+                    String.format("Transición inválida. No se puede cancelar una orden en estado %s.", this.status)
+            );
         }
         this.status = OrderStatus.CANCELLED;
     }
+
+    public void reject() {
+        if (this.status == OrderStatus.REJECTED) {
+            return; // Idempotencia
+        }
+        if (this.status != OrderStatus.PENDING) {
+            throw new InvalidOrderStateException(
+                    String.format("Transición inválida. No se puede rechazar una orden en estado %s.", this.status)
+            );
+        }
+        this.status = OrderStatus.REJECTED;
+    }
+
 
     // --- GETTERS ---
     public Long getId() { return id; }

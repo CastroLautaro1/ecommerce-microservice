@@ -1,89 +1,76 @@
 package com.ecommerce.order_service.application.services;
 
-import com.ecommerce.order_service.application.commands.CreateOrderCommand;
-import com.ecommerce.order_service.application.commands.OrderItemCommand;
+import com.ecommerce.order_service.domain.event.OrderPendingEvent;
 import com.ecommerce.order_service.domain.exceptions.DomainValidationException;
 import com.ecommerce.order_service.domain.models.Order;
 import com.ecommerce.order_service.domain.models.OrderItem;
-import com.ecommerce.order_service.domain.ports.in.CreateOrderUseCase;
-import com.ecommerce.order_service.domain.ports.out.CatalogClientPort;
-import com.ecommerce.order_service.domain.ports.out.InventoryClientPort;
+import com.ecommerce.order_service.domain.ports.out.EventPublisherPort;
 import com.ecommerce.order_service.domain.ports.out.OrderRepositoryPort;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
-public class CreateOrderService implements CreateOrderUseCase {
+public class CreateOrderService {
 
     private final OrderRepositoryPort orderRepository;
-    private final CatalogClientPort catalogClient;
-    private final InventoryClientPort inventoryClient;
+    private final EventPublisherPort eventPublisher;
 
-    public CreateOrderService(
-            OrderRepositoryPort orderRepository,
-            CatalogClientPort catalogClient,
-            InventoryClientPort inventoryClient) {
+    public CreateOrderService(OrderRepositoryPort orderRepository, EventPublisherPort eventPublisher) {
         this.orderRepository = orderRepository;
-        this.catalogClient = catalogClient;
-        this.inventoryClient = inventoryClient;
+        this.eventPublisher = eventPublisher;
     }
 
+    // Se invoca desde el orquestador
     @Transactional
-    @Override
-    public Order execute(CreateOrderCommand command) {
-        // Validar idempotencia para no crear ordenes duplicadas
-        if (orderRepository.findByOrderId(command.orderId()).isPresent()) {
-            throw new DomainValidationException("La orden con UUID " + command.orderId() + " ya fue procesada.");
+    public Order persistAndPublish(UUID orderId, Long userId, List<OrderItem> hydratedItems) {
+        if (orderRepository.findByOrderId(orderId).isPresent()) {
+            throw new DomainValidationException("La orden con UUID " + orderId + " ya fue procesada.");
         }
 
-        // Se trae la informacion necesaria de los productos
-        List<OrderItem> items = new ArrayList<>();
-        for (OrderItemCommand itemCommand : command.items()) {
-            CatalogClientPort.ProductSnapshot snapshot = catalogClient.getProductSnapshot(itemCommand.productId())
-                    .orElseThrow(() -> new DomainValidationException("Producto no encontrado en el catálogo ID: " + itemCommand.productId()));
+        Order order = new Order(orderId, userId, hydratedItems);
+        orderRepository.save(order);
 
-            // Instancia del value object para guardar los datos exactos del producto en ese momento
-            items.add(new OrderItem(
-                    snapshot.productId(),
-                    snapshot.name(),
-                    snapshot.currentPrice(),
-                    itemCommand.quantity()
-            ));
-        }
+        eventPublisher.publish(new OrderPendingEvent(order.getOrderId(), order.getItems()));
 
-        // Instanciamos una Orden la cual valida reglas de negocio internamente
-        Order order = new Order(command.orderId(), command.userId(), items);
-
-        // Se reserva la cantidad correspondiente de cada producto
-        try {
-            inventoryClient.reserveStock(order.getOrderId(), order.getItems());
-        } catch (Exception ex) {
-            log.error("Fallo al reservar stock para la orden {}: {}", order.getOrderId(), ex.getMessage());
-            // Si el inventario falla, abortamos todo. No hay estado local que revertir aún.
-            throw new DomainValidationException("No se pudo completar la reserva de inventario: " + ex.getMessage());
-        }
-
-        // Se guarda la orden
-        try {
-            return orderRepository.save(order);
-        } catch (Exception dbException) {
-            // Si la transaccion falla entonces se debe liberar el stock reservado en el Inventory Service
-            log.error("Fallo al guardar la orden local {}. Ejecutando compensación...", order.getOrderId());
-            try {
-                inventoryClient.cancelReservation(order.getOrderId());
-                log.info("Compensación exitosa: Todas las reservas para la orden {} fueron canceladas.", order.getOrderId());
-            } catch (Exception compensationEx) {
-                // Si no se puede liberar ese Stock entonces se tendra que hacer de forma manual
-                log.error("FALLO CRÍTICO DE COMPENSACIÓN. Las reservas para la orden {} requieren expiración automática o intervención manual.", order.getOrderId(), compensationEx);
-            }
-            throw new RuntimeException("Error interno al persistir la orden. Transacción abortada.");
-        }
+        return order;
     }
 
+
+//    @Override
+//    @Transactional
+//    public Order execute(CreateOrderCommand command) {
+//        // Validar idempotencia para no crear ordenes duplicadas
+//        if (orderRepository.findByOrderId(command.orderId()).isPresent()) {
+//            throw new DomainValidationException("La orden con UUID " + command.orderId() + " ya fue procesada.");
+//        }
+//
+//        // Se trae la informacion necesaria de los productos
+//        List<OrderItem> items = new ArrayList<>();
+//        for (OrderItemCommand itemCommand : command.items()) {
+//            CatalogClientPort.ProductSnapshot snapshot = catalogClient.getProductSnapshot(itemCommand.productId())
+//                    .orElseThrow(() -> new DomainValidationException("Producto no encontrado en el catálogo ID: " + itemCommand.productId()));
+//
+//            // Instancia del value object para guardar los datos exactos del producto en ese momento
+//            items.add(new OrderItem(
+//                    snapshot.productId(),
+//                    snapshot.name(),
+//                    snapshot.currentPrice(),
+//                    itemCommand.quantity()
+//            ));
+//        }
+//
+//        // Instanciamos una Orden la cual valida reglas de negocio internamente
+//        Order order = new Order(command.orderId(), command.userId(), items);
+//
+//        // Persistencia Local
+//        orderRepository.save(order);
+//
+//        // Emisión del Evento de Dominio
+//        eventPublisher.publish(new OrderPendingEvent(order.getOrderId(), order.getItems()));
+//
+//        return order;
+//    }
 }

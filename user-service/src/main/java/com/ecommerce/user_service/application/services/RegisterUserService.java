@@ -1,9 +1,9 @@
-package com.ecommerce.user_service.application;
+package com.ecommerce.user_service.application.services;
 
 import com.ecommerce.user_service.domain.exceptions.DomainValidationException;
 import com.ecommerce.user_service.domain.exceptions.UserAlreadyExistsException;
 import com.ecommerce.user_service.domain.models.User;
-import com.ecommerce.user_service.domain.ports.in.RegisterUserCommand;
+import com.ecommerce.user_service.application.commands.RegisterUserCommand;
 import com.ecommerce.user_service.domain.ports.in.RegisterUserUseCase;
 import com.ecommerce.user_service.domain.ports.out.PasswordEncoderPort;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;

@@ -1,9 +1,9 @@
-package com.ecommerce.user_service.application;
+package com.ecommerce.user_service.application.services;
 
 import com.ecommerce.user_service.domain.exceptions.UserAlreadyExistsException;
 import com.ecommerce.user_service.domain.exceptions.UserNotFoundException;
 import com.ecommerce.user_service.domain.models.User;
-import com.ecommerce.user_service.domain.ports.in.UpdateProfileCommand;
+import com.ecommerce.user_service.application.commands.UpdateProfileCommand;
 import com.ecommerce.user_service.domain.ports.in.UpdateProfileUseCase;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
 import jakarta.transaction.Transactional;

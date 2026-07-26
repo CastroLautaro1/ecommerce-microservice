@@ -1,10 +1,10 @@
-package com.ecommerce.user_service.application;
+package com.ecommerce.user_service.application.services;
 
 import com.ecommerce.user_service.domain.exceptions.AccountDeactivatedException;
 import com.ecommerce.user_service.domain.exceptions.InvalidCredentialsException;
 import com.ecommerce.user_service.domain.exceptions.UserNotFoundException;
 import com.ecommerce.user_service.domain.models.User;
-import com.ecommerce.user_service.domain.ports.in.LoginUserCommand;
+import com.ecommerce.user_service.application.commands.LoginUserCommand;
 import com.ecommerce.user_service.domain.ports.in.LoginUserUseCase;
 import com.ecommerce.user_service.domain.ports.out.PasswordEncoderPort;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;

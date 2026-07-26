@@ -1,5 +1,8 @@
 package com.ecommerce.user_service.infra.adapters.in.web;
 
+import com.ecommerce.user_service.application.commands.LoginUserCommand;
+import com.ecommerce.user_service.application.commands.RegisterUserCommand;
+import com.ecommerce.user_service.application.commands.UpdateProfileCommand;
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.*;
 import com.ecommerce.user_service.infra.adapters.in.web.dto.*;

@@ -1,4 +1,4 @@
-package com.ecommerce.user_service.application;
+package com.ecommerce.user_service.application.services;
 
 import com.ecommerce.user_service.domain.exceptions.UserNotFoundException;
 import com.ecommerce.user_service.domain.models.User;

@@ -1,4 +1,4 @@
-package com.ecommerce.user_service.domain.ports.in;
+package com.ecommerce.user_service.application.commands;
 
 import com.ecommerce.user_service.domain.models.PersonalInfo;
 import com.ecommerce.user_service.domain.models.TaxStatus;

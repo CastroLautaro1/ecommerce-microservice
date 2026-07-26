@@ -7,6 +7,9 @@ import com.ecommerce.inventory_service.infra.adapter.out.persistence.entity.Rese
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -79,5 +82,38 @@ public class InventoryMapper {
         jpaEntity.setExpiresAt(domain.getExpiresAt());
 
         return jpaEntity;
+    }
+
+    // Mapeo con Estado para proteger la integridad relacional de JPA
+    public void updateEntityFromDomain(InventoryJpaEntity entity, Inventory domain) {
+        // Actualizamos propiedades raiz
+        entity.setAvailableStock(domain.getAvailableStock());
+        entity.setTotalStock(domain.getTotalStock());
+
+        // Se actualizan las reservas anidadas sin perder las referencias de JPA
+        Map<UUID, ReservationJpaEntity> existingReservations = entity.getReservations().stream()
+                .collect(Collectors.toMap(ReservationJpaEntity::getReservationId, Function.identity()));
+
+        for (Reservation resDomain : domain.getReservations()) {
+            ReservationJpaEntity resEntity = existingReservations.get(resDomain.getReservationId());
+
+            if (resEntity != null) {
+                // Actualiza la entidad existente -> Genera un UPDATE en SQL
+                resEntity.setStatus(resDomain.getStatus());
+                resEntity.setQuantity(resDomain.getQuantity());
+                resEntity.setExpiresAt(resDomain.getExpiresAt());
+            } else {
+                // Si la reserva en el dominio es nueva, la instanciamos y la vinculamos -> Genera un INSERT en SQL
+                ReservationJpaEntity newRes = new ReservationJpaEntity();
+                newRes.setReservationId(resDomain.getReservationId());
+                newRes.setOrderId(resDomain.getOrderId());
+                newRes.setQuantity(resDomain.getQuantity());
+                newRes.setStatus(resDomain.getStatus());
+                newRes.setCreatedAt(resDomain.getCreatedAt());
+                newRes.setExpiresAt(resDomain.getExpiresAt());
+
+                entity.addReservation(newRes);
+            }
+        }
     }
 }

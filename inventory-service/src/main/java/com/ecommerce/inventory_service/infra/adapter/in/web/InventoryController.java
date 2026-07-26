@@ -76,7 +76,7 @@ public class InventoryController {
         return ResponseEntity.noContent().build();
     }
 
-    // Cancelar reservas en bloque
+    // Cancela reservas en bloque
     @PutMapping("/orders/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrderReservations(@PathVariable UUID orderId) {
         // El caso de uso buscará todas las reservas de esta orden y las liberará atómicamente.

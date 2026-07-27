@@ -22,7 +22,7 @@ public class CreateProductService implements CreateProductUseCase {
     public Product execute(CreateProductCommand command) {
         Price price = new Price(command.priceAmount(), command.priceCurrency());
 
-        Product newProduct = new Product(
+        Product newProduct = Product.registerProduct(
                 command.name(),
                 command.description(),
                 price,

@@ -7,6 +7,7 @@ import com.ecommerce.catalog_service.domain.ports.out.ProductRepositoryPort;
 import com.ecommerce.catalog_service.infra.adapters.out.persistence.entity.ImageEmbeddable;
 import com.ecommerce.catalog_service.infra.adapters.out.persistence.entity.PriceEmbeddable;
 import com.ecommerce.catalog_service.infra.adapters.out.persistence.entity.ProductJpaEntity;
+import com.ecommerce.catalog_service.infra.adapters.out.persistence.mapper.ProductEntityMapper;
 import com.ecommerce.catalog_service.infra.adapters.out.persistence.repository.SpringDataProductRepository;
 import org.springframework.stereotype.Component;
 
@@ -20,9 +21,11 @@ import java.util.stream.Collectors;
 public class ProductPersistenceAdapter implements ProductRepositoryPort {
 
     private final SpringDataProductRepository jpaRepository;
+    private final ProductEntityMapper productMapper;
 
-    public ProductPersistenceAdapter(SpringDataProductRepository jpaRepository) {
+    public ProductPersistenceAdapter(SpringDataProductRepository jpaRepository, ProductEntityMapper productMapper) {
         this.jpaRepository = jpaRepository;
+        this.productMapper = productMapper;
     }
 
     @Override

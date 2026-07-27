@@ -3,7 +3,7 @@ package com.ecommerce.inventory_service.infra.adapter.out.persistence;
 import com.ecommerce.inventory_service.domain.models.Inventory;
 import com.ecommerce.inventory_service.domain.ports.out.InventoryRepositoryPort;
 import com.ecommerce.inventory_service.infra.adapter.out.persistence.entity.InventoryJpaEntity;
-import com.ecommerce.inventory_service.infra.adapter.out.persistence.mapper.InventoryMapper;
+import com.ecommerce.inventory_service.infra.adapter.out.persistence.mapper.InventoryEntityMapper;
 import com.ecommerce.inventory_service.infra.adapter.out.persistence.repository.SpringDataInventoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 public class InventoryRepositoryAdapter implements InventoryRepositoryPort {
 
     private final SpringDataInventoryRepository springDataRepository;
-    private final InventoryMapper inventoryMapper;
+    private final InventoryEntityMapper inventoryMapper;
 
-    public InventoryRepositoryAdapter(SpringDataInventoryRepository springDataRepository, InventoryMapper inventoryMapper) {
+    public InventoryRepositoryAdapter(SpringDataInventoryRepository springDataRepository, InventoryEntityMapper inventoryMapper) {
         this.springDataRepository = springDataRepository;
         this.inventoryMapper = inventoryMapper;
     }
@@ -60,7 +60,7 @@ public class InventoryRepositoryAdapter implements InventoryRepositoryPort {
 
             if (jpaEntity != null) {
                 // Flujo de actualizacion
-                inventoryMapper.updateEntityFromDomain(jpaEntity, domain);
+                inventoryMapper.updateEntityFromDomain(domain, jpaEntity);
             } else {
                 // Flujo de creacion
                 InventoryJpaEntity newEntity = inventoryMapper.toJpaEntity(domain);

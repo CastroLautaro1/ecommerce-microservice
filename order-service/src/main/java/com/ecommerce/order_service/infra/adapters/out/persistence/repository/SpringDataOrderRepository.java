@@ -1,4 +1,4 @@
-package com.ecommerce.order_service.infra.adapters.out.persistence;
+package com.ecommerce.order_service.infra.adapters.out.persistence.repository;
 
 import com.ecommerce.order_service.infra.adapters.out.persistence.entity.OrderJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -52,6 +52,11 @@ public class OrderJpaEntity {
         this.items = items;
     }
 
+    public void addItem(OrderItemJpaEntity newItem) {
+        newItem.setOrder(this);
+        this.items.add(newItem);
+    }
+
     public void addItems(List<OrderItemJpaEntity> newItems) {
         newItems.forEach(item -> {
             item.setOrder(this);

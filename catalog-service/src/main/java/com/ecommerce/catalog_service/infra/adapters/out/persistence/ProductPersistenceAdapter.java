@@ -30,98 +30,41 @@ public class ProductPersistenceAdapter implements ProductRepositoryPort {
 
     @Override
     public Product save(Product product) {
-        ProductJpaEntity entity = mapToJpaEntity(product);
+        ProductJpaEntity entity = productMapper.toJpaEntity(product);
         ProductJpaEntity savedEntity = jpaRepository.save(entity);
-        return mapToDomain(savedEntity);
+        return productMapper.toDomainModel(savedEntity);
     }
 
     @Override
     public Optional<Product> findById(Long id) {
-        return jpaRepository.findById(id).map(this::mapToDomain);
+        return jpaRepository.findById(id).map(productMapper::toDomainModel);
     }
 
     @Override
     public List<Product> findActiveProducts() {
         return jpaRepository.findByActiveTrue().stream()
-                .map(this::mapToDomain)
+                .map(productMapper::toDomainModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Product> findActiveProductsByCategory(Long categoryId) {
         return jpaRepository.findByCategoryIdAndActiveTrue(categoryId).stream()
-                .map(this::mapToDomain)
+                .map(productMapper::toDomainModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Product> searchActiveProductsByName(String keyword) {
         return jpaRepository.findByNameContainingIgnoreCaseAndActiveTrue(keyword).stream()
-                .map(this::mapToDomain)
+                .map(productMapper::toDomainModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Product> findActiveProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
         return jpaRepository.findByPriceAmountBetweenAndActiveTrue(minPrice, maxPrice).stream()
-                .map(this::mapToDomain)
+                .map(productMapper::toDomainModel)
                 .collect(Collectors.toList());
-    }
-
-    // --- Métodos privados de mapeo (Traducción manual conceptual) ---
-
-    private Product mapToDomain(ProductJpaEntity entity) {
-        if (entity == null) return null;
-
-        Price price = null;
-        if (entity.getPrice() != null) {
-            price = new Price(entity.getPrice().getAmount(), entity.getPrice().getCurrency());
-        }
-
-        List<ProductImage> images = new ArrayList<>();
-        if (entity.getImages() != null) {
-            images = entity.getImages().stream()
-                    .map(img -> new ProductImage(img.getUrl(), img.isMain()))
-                    .collect(Collectors.toList());
-        }
-
-        return new Product(
-                entity.getId(),
-                entity.getName(),
-                entity.getDescription(),
-                price,
-                entity.getSellerId(),
-                entity.getCategoryId(),
-                images,
-                entity.isActive(),
-                entity.getCreatedAt()
-        );
-    }
-
-    private ProductJpaEntity mapToJpaEntity(Product domain) {
-        if (domain == null) return null;
-
-        ProductJpaEntity entity = new ProductJpaEntity();
-
-        entity.setId(domain.getId());
-        entity.setName(domain.getName());
-        entity.setDescription(domain.getDescription());
-        entity.setSellerId(domain.getSellerId());
-        entity.setCategoryId(domain.getCategoryId());
-        entity.setActive(domain.isActive());
-        entity.setCreatedAt(domain.getCreatedAt());
-
-        if (domain.getPrice() != null) {
-            entity.setPrice(new PriceEmbeddable(domain.getPrice().amount(), domain.getPrice().currency()));
-        }
-
-        if (domain.getImages() != null) {
-            List<ImageEmbeddable> embeddableImages = domain.getImages().stream()
-                    .map(img -> new ImageEmbeddable(img.url(), img.isMain()))
-                    .collect(Collectors.toList());
-            entity.setImages(embeddableImages);
-        }
-
-        return entity;
     }
 }

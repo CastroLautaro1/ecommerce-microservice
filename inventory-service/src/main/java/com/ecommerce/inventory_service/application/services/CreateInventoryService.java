@@ -28,8 +28,7 @@ public class CreateInventoryService implements CreateInventoryUseCase {
             throw new DomainValidationException("Ya existe un inventario registrado con el SKU: " + command.sku());
         }
 
-        // Instanciamos un Inventario
-        Inventory newInventory = new Inventory(
+        Inventory newInventory = Inventory.registerInventory(
                 command.productId(),
                 command.sku(),
                 command.initialStock()

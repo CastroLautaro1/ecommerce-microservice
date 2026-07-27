@@ -34,7 +34,7 @@ public class RegisterUserService implements RegisterUserUseCase {
 
         String hashedPassword = passwordEncoder.encode(command.rawPassword());
 
-        User newUser = new User(generatedUsername, command.email(), hashedPassword, command.firstName(), command.lastName());
+        User newUser = User.registerNew(generatedUsername, command.email(), hashedPassword, command.firstName(), command.lastName());
 
         User savedUser = userRepository.save(newUser);
 

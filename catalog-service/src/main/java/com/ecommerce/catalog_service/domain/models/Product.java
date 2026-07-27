@@ -22,20 +22,23 @@ public class Product {
 
     private static final int MAX_IMAGES_ALLOWED = 5;
 
-    // Constructor para la creación de un NUEVO producto
-    public Product(String name, String description, Price price, Long sellerId, Long categoryId) {
+    // Factory Method para la creacion de un Producto
+    public static Product registerProduct(String name, String description, Price price, Long sellerId, Long categoryId) {
         validateName(name);
         if (sellerId == null) throw new IllegalArgumentException("El producto debe pertenecer a un vendedor");
         if (categoryId == null) throw new IllegalArgumentException("El producto debe tener una categoría asociada");
 
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.sellerId = sellerId;
-        this.categoryId = categoryId;
-        this.images = new ArrayList<>();
-        this.active = true;
-        this.createdAt = LocalDateTime.now();
+        return new Product(
+                null,
+                name,
+                description,
+                price,
+                sellerId,
+                categoryId,
+                new ArrayList<>(),
+                true,
+                LocalDateTime.now()
+        );
     }
 
     // Constructor para reconstituir el producto desde la Base de Datos
@@ -132,7 +135,7 @@ public class Product {
 
     // --- MÉTODOS DE PROTECCIÓN INTERNA ---
 
-    private void validateName(String name) {
+    private static void validateName(String name) {
         if (name == null || name.trim().length() < 3) {
             throw new IllegalArgumentException("El nombre del producto debe tener al menos 3 caracteres");
         }

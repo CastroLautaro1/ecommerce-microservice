@@ -6,6 +6,7 @@ import com.ecommerce.user_service.domain.exceptions.DomainValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class User {
     private Long id;
@@ -19,6 +20,12 @@ public class User {
     private List<SavedPaymentMethod> paymentMethods = new ArrayList<>(); // Se pueden tener varias tarjetas
     private boolean active;
     private LocalDateTime createdAt;
+
+    // Regex para validar el Email
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
+
+    // Regla: Minimo 8 caracteres, al menos una mayúscula, una minúscula, un número y un carácter especial.
+    private static final Pattern PASSWORD_COMPLEXITY_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,30}$");
 
     // Constructor all-args para reconstitucion
     public User(Long id, String username, String email, String passwordHash, Role role,
@@ -63,12 +70,25 @@ public class User {
             throw new DomainValidationException("El nombre de usuario es obligatorio y debe tener entre 3 y 30 caracteres");
         }
 
-        if (email == null || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+        if (email == null || email.isBlank()) {
             throw new DomainValidationException("El formato del correo electrónico es inválido");
+        }
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw new DomainValidationException("El formato del correo electrónico es inválido.");
         }
 
         if (passwordHash == null || passwordHash.isBlank()) {
             throw new DomainValidationException("El hash de la contraseña es obligatorio");
+        }
+    }
+
+    // Validacion Pre-Hashing. Se llamada desde el caso de uso
+    public static void validateRawPasswordComplexity(String rawPassword) {
+        if (rawPassword == null || rawPassword.isBlank()) {
+            throw new DomainValidationException("La contraseña no puede estar vacía.");
+        }
+        if (!PASSWORD_COMPLEXITY_PATTERN.matcher(rawPassword).matches()) {
+            throw new DomainValidationException("La contraseña debe tener entre 8 y 30 caracteres, incluir una mayúscula, un número y un carácter especial.");
         }
     }
 
@@ -100,6 +120,20 @@ public class User {
 
         this.personalInfo = info;
         this.taxStatus = taxStatus != null ? taxStatus : this.taxStatus;
+    }
+
+    public void updatePassword(String encodedNewPassword) {
+        if (encodedNewPassword == null || encodedNewPassword.isBlank()) {
+            throw new DomainValidationException("El hash de la contraseña no puede estar vacío.");
+        }
+        this.passwordHash = encodedNewPassword;
+    }
+
+    public void updateEmail(String newEmail) {
+        if (newEmail == null || !newEmail.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+            throw new DomainValidationException("El formato del correo electrónico es inválido.");
+        }
+        this.email = newEmail;
     }
 
     public void addAddress(Address address) {

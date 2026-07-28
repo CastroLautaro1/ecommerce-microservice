@@ -14,7 +14,7 @@ public class Reservation {
     private final Instant createdAt;
     private final Instant expiresAt;
 
-    public Reservation(UUID reservationId, UUID orderId, int quantity, Instant expiresAt) {
+    public static Reservation registerReservation(UUID reservationId, UUID orderId, int quantity, Instant expiresAt) {
         if (reservationId == null) throw new DomainValidationException("El ID de la reserva es obligatorio");
         if (orderId == null) throw new DomainValidationException("El ID de la orden es obligatorio");
         if (quantity <= 0) throw new DomainValidationException("La cantidad a reservar debe ser mayor a cero");
@@ -22,12 +22,14 @@ public class Reservation {
             throw new DomainValidationException("La fecha de expiración de la reserva es inválida");
         }
 
-        this.reservationId = reservationId;
-        this.orderId = orderId;
-        this.quantity = quantity;
-        this.status = ReservationStatus.ACTIVE;
-        this.createdAt = Instant.now();
-        this.expiresAt = expiresAt;
+        return new Reservation(
+                reservationId,
+                orderId,
+                quantity,
+                ReservationStatus.ACTIVE, // Activa por defecto
+                Instant.now(),
+                expiresAt
+        );
     }
 
     // Constructor de reconstrucción (Usado exclusivamente por el Mapeador de Infraestructura)

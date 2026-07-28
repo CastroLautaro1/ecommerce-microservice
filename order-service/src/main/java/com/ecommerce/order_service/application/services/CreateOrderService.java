@@ -30,7 +30,7 @@ public class CreateOrderService {
             throw new DomainValidationException("La orden con UUID " + orderId + " ya fue procesada.");
         }
 
-        Order order = new Order(orderId, userId, hydratedItems);
+        Order order = Order.registerOrder(orderId, userId, hydratedItems);
         orderRepository.save(order);
 
         eventPublisher.publish(new OrderPendingEvent(order.getOrderId(), order.getItems()));

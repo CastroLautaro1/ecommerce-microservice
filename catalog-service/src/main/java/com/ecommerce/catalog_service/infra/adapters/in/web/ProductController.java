@@ -1,5 +1,8 @@
 package com.ecommerce.catalog_service.infra.adapters.in.web;
 
+import com.ecommerce.catalog_service.application.commands.CreateProductCommand;
+import com.ecommerce.catalog_service.application.commands.DeactivateProductCommand;
+import com.ecommerce.catalog_service.application.commands.UpdateProductCommand;
 import com.ecommerce.catalog_service.domain.ports.in.*;
 import com.ecommerce.catalog_service.infra.adapters.in.web.dto.CreateProductRequest;
 import com.ecommerce.catalog_service.infra.adapters.in.web.dto.UpdateProductRequest;

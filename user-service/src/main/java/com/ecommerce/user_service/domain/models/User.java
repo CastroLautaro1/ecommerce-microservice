@@ -20,19 +20,7 @@ public class User {
     private boolean active;
     private LocalDateTime createdAt;
 
-    // Constructor usado para el Registro
-    public User(String username, String email, String passwordHash, String firstName, String lastName) {
-        validateRegistrationData(username, email, passwordHash);
-
-        this.username = username.trim();
-        this.email = email.trim().toLowerCase(); // Guardamos el email siempre en minúsculas
-        this.passwordHash = passwordHash.trim();
-        this.role = Role.USER;
-        this.personalInfo = new PersonalInfo(firstName, lastName, null, null);
-        this.active = true;
-        this.createdAt = LocalDateTime.now();
-    }
-
+    // Constructor all-args para reconstitucion
     public User(Long id, String username, String email, String passwordHash, Role role,
                 PersonalInfo personalInfo, TaxStatus taxStatus, List<Address> addresses,
                 List<SavedPaymentMethod> paymentMethods, boolean active, LocalDateTime createdAt) {
@@ -49,9 +37,28 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    // Factory Method para la creacion de negocio
+    public static User registerNew(String username, String email, String passwordHash, String firstName, String lastName) {
+        validateRegistrationData(username, email, passwordHash);
+
+        return new User(
+                null, // Nulo porque aun no persiste
+                username.trim(),
+                email.trim().toLowerCase(),
+                passwordHash.trim(),
+                Role.USER,
+                new PersonalInfo(firstName, lastName, null, null),
+                null,
+                new ArrayList<>(), // Direcciones iniciales
+                new ArrayList<>(), // Métodos de pago iniciales
+                true,
+                LocalDateTime.now()
+        );
+    }
+
     // --- REGLAS DE NEGOCIO (COMPORTAMIENTO) ---
 
-    private void validateRegistrationData(String username, String email, String passwordHash) {
+    private static void validateRegistrationData(String username, String email, String passwordHash) {
         if (username == null || username.isBlank() || username.length() < 3 || username.length() > 30) {
             throw new DomainValidationException("El nombre de usuario es obligatorio y debe tener entre 3 y 30 caracteres");
         }
@@ -59,7 +66,6 @@ public class User {
         if (email == null || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
             throw new DomainValidationException("El formato del correo electrónico es inválido");
         }
-        this.email = email.toLowerCase().trim();
 
         if (passwordHash == null || passwordHash.isBlank()) {
             throw new DomainValidationException("El hash de la contraseña es obligatorio");

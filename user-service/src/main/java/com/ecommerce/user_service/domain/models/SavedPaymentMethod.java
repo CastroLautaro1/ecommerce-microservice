@@ -9,13 +9,16 @@ public class SavedPaymentMethod {
     private String lastFourDigits; // "4242"
     private boolean isDefault;
 
-    public SavedPaymentMethod(String token, String cardBrand, String lastFourDigits) {
+    public static SavedPaymentMethod registerPaymentMethod(String token, String cardBrand, String lastFourDigits) {
         validate(token, cardBrand, lastFourDigits);
-        this.id = UUID.randomUUID().toString();
-        this.token = token.trim();
-        this.cardBrand = cardBrand.trim().toUpperCase();
-        this.lastFourDigits = lastFourDigits.trim();
-        this.isDefault = false;
+
+        return new SavedPaymentMethod(
+                null,
+                token,
+                cardBrand,
+                lastFourDigits,
+                false
+        );
     }
 
     public SavedPaymentMethod(String id, String token, String cardBrand, String lastFourDigits, boolean isDefault) {
@@ -26,7 +29,7 @@ public class SavedPaymentMethod {
         this.isDefault = isDefault;
     }
 
-    private void validate(String token, String cardBrand, String lastFourDigits) {
+    private static void validate(String token, String cardBrand, String lastFourDigits) {
         if (token == null || token.isBlank()) {
             throw new IllegalArgumentException("El token del procesador de pagos es obligatorio");
         }

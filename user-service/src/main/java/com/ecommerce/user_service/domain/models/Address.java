@@ -11,15 +11,18 @@ public class Address {
     private String state;
     private boolean isDefault;
 
-    public Address(String street, String number, String zipCode, String city, String state) {
+    public static Address registerAddress(String street, String number, String zipCode, String city, String state) {
         validate(street, number, zipCode, city, state);
-        this.id = UUID.randomUUID().toString();
-        this.street = street.trim();
-        this.number = number.trim();
-        this.zipCode = zipCode.trim();
-        this.city = city.trim();
-        this.state = state.trim();
-        this.isDefault = false; // Por defecto es falso, el Agregado 'User' decidirá si la hace true
+
+        return new Address(
+                null,
+                street,
+                number,
+                zipCode,
+                city,
+                state,
+                false// False por defecto, el agregado User decide si la hace True
+        );
     }
 
     public Address(String id, String street, String number, String zipCode, String city, String state, boolean isDefault) {
@@ -32,7 +35,7 @@ public class Address {
         this.isDefault = isDefault;
     }
 
-    private void validate(String street, String number, String zipCode, String city, String state) {
+    private static void validate(String street, String number, String zipCode, String city, String state) {
         if (street == null || street.isBlank()) throw new IllegalArgumentException("La calle es obligatoria");
         if (number == null || number.isBlank()) throw new IllegalArgumentException("El número o altura es obligatorio");
         if (zipCode == null || zipCode.isBlank()) throw new IllegalArgumentException("El código postal es obligatorio");

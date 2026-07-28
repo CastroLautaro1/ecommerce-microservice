@@ -3,6 +3,7 @@ package com.ecommerce.user_service.infra.adapters.out.persistence;
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
 import com.ecommerce.user_service.infra.adapters.out.persistence.entity.UserJpaEntity;
+import com.ecommerce.user_service.infra.adapters.out.persistence.mapper.UserEntityMapper;
 import com.ecommerce.user_service.infra.adapters.out.persistence.repository.SpringDataUserRepository;
 import org.springframework.stereotype.Repository;
 

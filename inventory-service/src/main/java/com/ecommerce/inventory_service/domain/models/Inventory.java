@@ -18,17 +18,20 @@ public class Inventory {
     private int availableStock;
     private final List<Reservation> reservations;
 
-    // Constructor para crear un inventario desde cero para un nuevo producto
-    public Inventory(Long productId, String sku, int initialStock) {
+    // Factory Method para crear un inventario desde cero para un nuevo producto
+    public static Inventory registerInventory(Long productId, String sku, int initialStock) {
         if (productId == null) throw new DomainValidationException("El ID del producto es obligatorio");
         if (sku == null || sku.isBlank()) throw new DomainValidationException("El SKU es obligatorio");
         if (initialStock < 0) throw new DomainValidationException("El stock inicial no puede ser negativo");
 
-        this.productId = productId;
-        this.sku = sku.trim().toUpperCase();
-        this.totalStock = initialStock;
-        this.availableStock = initialStock; // Al inicio, todo el stock está disponible
-        this.reservations = new ArrayList<>();
+        return new Inventory(
+                null,
+                productId,
+                sku.trim().toUpperCase(),
+                initialStock,
+                initialStock, // Al inicio, todo el stock está disponible
+                new ArrayList<>()
+        );
     }
 
     // Constructor para leer desde la BD
@@ -54,7 +57,8 @@ public class Inventory {
             throw new InsufficientStockException(this.sku, quantity, this.availableStock);
         }
 
-        Reservation newReservation = new Reservation(reservationId, orderId, quantity, expiresAt);
+        //Reservation newReservation = new Reservation(reservationId, orderId, quantity, expiresAt);
+        Reservation newReservation = Reservation.registerReservation(reservationId, orderId, quantity, expiresAt);
         this.reservations.add(newReservation);
 
         // Descontamos únicamente del stock disponible, el físico (total) sigue intacto en el almacén

@@ -20,17 +20,19 @@ public class Order {
     private BigDecimal totalAmount;
 
     // Constructor para crear una nueva Orden
-    public Order(UUID orderId, Long userId, List<OrderItem> items) {
+    public static Order registerOrder(UUID orderId, Long userId, List<OrderItem> items) {
         if (orderId == null) throw new DomainValidationException("El OrderId (UUID) es obligatorio para la idempotencia");
         if (userId == null) throw new DomainValidationException("El ID de usuario es obligatorio");
         if (items == null || items.isEmpty()) throw new DomainValidationException("La orden no puede estar vacía");
 
-        this.orderId = orderId;
-        this.userId = userId;
-        this.status = OrderStatus.PENDING;
-        this.createdAt = Instant.now();
-        this.items = new ArrayList<>(items);
-        this.totalAmount = calculateTotalAmount();
+        return new Order(
+                null,
+                orderId,
+                userId,
+                OrderStatus.PENDING, // Pendiente por defecto
+                Instant.now(),
+                items
+        );
     }
 
     // Constructor para reconstruccion desde la BdD
@@ -41,13 +43,13 @@ public class Order {
         this.status = status;
         this.createdAt = createdAt;
         this.items = new ArrayList<>(items);
-        this.totalAmount = calculateTotalAmount();
+        this.totalAmount = calculateTotalAmount(items);
     }
 
     // --- LÓGICA DE NEGOCIO ---
 
-    private BigDecimal calculateTotalAmount() {
-        return this.items.stream()
+    private static BigDecimal calculateTotalAmount(List<OrderItem> items) {
+        return items.stream()
                 .map(OrderItem::calculateSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

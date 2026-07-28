@@ -1,8 +1,6 @@
 package com.ecommerce.user_service.infra.adapters.in.web;
 
-import com.ecommerce.user_service.application.commands.LoginUserCommand;
-import com.ecommerce.user_service.application.commands.RegisterUserCommand;
-import com.ecommerce.user_service.application.commands.UpdateProfileCommand;
+import com.ecommerce.user_service.application.commands.*;
 import com.ecommerce.user_service.domain.models.User;
 import com.ecommerce.user_service.domain.ports.in.*;
 import com.ecommerce.user_service.infra.adapters.in.web.dto.*;
@@ -16,17 +14,23 @@ public class UserController {
 
     private final RegisterUserUseCase registerUserUseCase;
     private final LoginUserUseCase loginUserUseCase;
+    private final UpdatePasswordUseCase updatePasswordUseCase;
+    private final UpdateEmailUseCase updateEmailUseCase;
     private final UpdateProfileUseCase updateProfileUseCase;
     private final DeactivateAccountUseCase deactivateAccountUseCase;
     private final UserQueryUseCases userQueryUseCases;
 
     public UserController(RegisterUserUseCase registerUserUseCase,
                           LoginUserUseCase loginUserUseCase,
+                          UpdatePasswordUseCase updatePasswordUseCase,
+                          UpdateEmailUseCase updateEmailUseCase,
                           UpdateProfileUseCase updateProfileUseCase,
                           DeactivateAccountUseCase deactivateAccountUseCase,
                           UserQueryUseCases userQueryUseCases) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUserUseCase = loginUserUseCase;
+        this.updatePasswordUseCase = updatePasswordUseCase;
+        this.updateEmailUseCase = updateEmailUseCase;
         this.updateProfileUseCase = updateProfileUseCase;
         this.deactivateAccountUseCase = deactivateAccountUseCase;
         this.userQueryUseCases = userQueryUseCases;
@@ -74,6 +78,27 @@ public class UserController {
         );
 
         updateProfileUseCase.execute(command);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me/password")
+    public ResponseEntity<Void> updatePassword(@RequestBody UpdatePasswordRequest request) {
+        UpdatePasswordCommand command = new UpdatePasswordCommand(
+                request.userId(),
+                request.currentPassword(),
+                request.newPassword()
+        );
+        updatePasswordUseCase.execute(command);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me/email")
+    public ResponseEntity<Void> updateEmail(@RequestBody UpdateEmailRequest request) {
+        UpdateEmailCommand command = new UpdateEmailCommand(
+                request.userId(),
+                request.newEmail()
+        );
+        updateEmailUseCase.execute(command);
         return ResponseEntity.noContent().build();
     }
 

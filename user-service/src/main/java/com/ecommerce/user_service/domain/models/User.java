@@ -25,7 +25,7 @@ public class User {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
 
     // Regla: Minimo 8 caracteres, al menos una mayúscula, una minúscula, un número y un carácter especial.
-    private static final Pattern PASSWORD_COMPLEXITY_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,30}$");
+    private static final Pattern PASSWORD_COMPLEXITY_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_\\-.])[A-Za-z\\d@$!%*?&_\\-.]{8,30}$");
 
     // Constructor all-args para reconstitucion
     public User(Long id, String username, String email, String passwordHash, Role role,

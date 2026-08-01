@@ -1,4 +1,6 @@
-package com.ecommerce.catalog_service.domain.models;
+package com.ecommerce.catalog_service.category.domain.models;
+
+import com.ecommerce.catalog_service.shared.domain.exception.BusinessRuleViolationException;
 
 public class Category {
 
@@ -7,12 +9,16 @@ public class Category {
     private Long parentId; // Clave para formar el árbol. Si es null, es una Categoría Raíz.
     private boolean active;
 
-    // Constructor para una NUEVA categoría
-    public Category(String name, Long parentId) {
+    // Factory Method para crear una nueva Categoria
+    public static Category registerCategory(String name, Long parentId) {
         validateName(name);
-        this.name = name;
-        this.parentId = parentId; // Puede ser null
-        this.active = true;
+
+        return new Category(
+                null,
+                name,
+                parentId, // Puede ser null
+                true
+        );
     }
 
     // Constructor para reconstituir desde la Base de Datos
@@ -25,30 +31,33 @@ public class Category {
 
     // --- COMPORTAMIENTO DEL DOMINIO ---
 
+    // Actualiza el nombre de la categoria
     public void updateName(String newName) {
         validateName(newName);
         this.name = newName;
     }
 
-    public void moveUnderParent(Long newParentId) {
-        // Regla de negocio: Una categoría no puede ser padre de sí misma
-        if (this.id != null && this.id.equals(newParentId)) {
-            throw new IllegalStateException("Una categoría no puede ser su propio padre");
-        }
+    // Actualiza la Cateogria padre actual
+    public void changeParent(Long newParentId) {
+        // El caso de uso se encarga de ejecutar la validacion de ciclo profundo
         this.parentId = newParentId;
     }
 
-    public void makeRoot() {
+    // Convierte esta categoría en un nodo raíz (sin padre).
+    public void promoteToRoot() {
         this.parentId = null;
     }
 
     public void deactivate() {
+        if (!this.active) {
+            throw new BusinessRuleViolationException("La categoría ya se encuentra inactiva.");
+        }
         this.active = false;
     }
 
     // --- MÉTODOS DE PROTECCIÓN INTERNA ---
 
-    private void validateName(String name) {
+    private static void validateName(String name) {
         if (name == null || name.trim().length() < 3) {
             throw new IllegalArgumentException("El nombre de la categoría debe tener al menos 3 caracteres");
         }

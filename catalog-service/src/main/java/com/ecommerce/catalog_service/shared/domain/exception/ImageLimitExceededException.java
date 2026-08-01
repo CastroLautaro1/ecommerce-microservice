@@ -1,4 +1,4 @@
-package com.ecommerce.catalog_service.domain.exceptions;
+package com.ecommerce.catalog_service.shared.domain.exception;
 
 public class ImageLimitExceededException extends RuntimeException {
     public ImageLimitExceededException(int maxImages) {

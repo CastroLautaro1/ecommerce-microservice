@@ -1,8 +1,9 @@
-package com.ecommerce.catalog_service.infra.adapters.in.web;
+package com.ecommerce.catalog_service.shared.infra.in.web.exception;
 
-import com.ecommerce.catalog_service.domain.exceptions.ImageLimitExceededException;
-import com.ecommerce.catalog_service.domain.exceptions.ProductNotFoundException;
-import com.ecommerce.catalog_service.domain.exceptions.UnauthorizedSellerException;
+import com.ecommerce.catalog_service.shared.domain.exception.BusinessRuleViolationException;
+import com.ecommerce.catalog_service.shared.domain.exception.ImageLimitExceededException;
+import com.ecommerce.catalog_service.shared.domain.exception.ResourceNotFoundException;
+import com.ecommerce.catalog_service.shared.domain.exception.UnauthorizedSellerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,45 +16,43 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 404 NOT FOUND para recursos inexistentes
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleProductNotFound(ProductNotFoundException ex) {
+    // Recursos inexistentes -> 404 Not Found
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    // 403 FORBIDDEN para problemas de permisos
+    // Problemas de permisos -> 403 Forbidden
     @ExceptionHandler(UnauthorizedSellerException.class)
     public ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedSellerException ex) {
         return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
-    // 409 CONFLICT para reglas de negocio violadas
+    // Reglas de negocios violadas -> 409 Conflict
+    @ExceptionHandler(BusinessRuleViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleImageLimit(BusinessRuleViolationException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    // Exceso en el limite de imagenes -> 409 Conflict
     @ExceptionHandler(ImageLimitExceededException.class)
     public ResponseEntity<Map<String, Object>> handleImageLimit(ImageLimitExceededException ex) {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
-    /**
-     * Captura validaciones de entrada fallidas (ej. "El precio no puede ser negativo").
-     * Retorna HTTP 400 Bad Request.
-     */
+    // Violaciones de entrada fallidas -> 400 Bad Request
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    /**
-     * Captura violaciones de estado de negocio (ej. "Usuario no autorizado para modificar").
-     * Retorna HTTP 409 Conflict o HTTP 403 Forbidden. Usaremos 409 para reglas de negocio rotas.
-     */
+    // Reglas de negocio rotas -> 409 Conflict
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException ex) {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
-    /**
-     * Metodo auxiliar para construir un JSON de error estandarizado.
-     */
+    // Metodo auxiliar para construir un JSON de error estandarizado
     private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status, String message) {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("timestamp", LocalDateTime.now());

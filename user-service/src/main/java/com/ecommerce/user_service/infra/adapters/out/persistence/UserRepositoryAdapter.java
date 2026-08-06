@@ -69,4 +69,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long userId) {
         return jpaRepository.existsByPersonalInfo_PhoneNumberAndIdNot(phoneNumber, userId);
     }
+
+    @Override
+    public Optional<Boolean> existsAndIsActive(Long userId) {
+        return jpaRepository.findActiveStatusById(userId);
+    }
 }

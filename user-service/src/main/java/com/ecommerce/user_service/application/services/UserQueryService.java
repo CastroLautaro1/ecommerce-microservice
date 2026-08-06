@@ -22,4 +22,10 @@ public class UserQueryService implements UserQueryUseCases {
         return userRepository.findActiveById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
+
+    @Override
+    public boolean existsAndIsActive(Long userId) {
+        return userRepository.existsAndIsActive(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
 }

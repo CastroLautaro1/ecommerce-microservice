@@ -1,9 +1,6 @@
 package com.ecommerce.catalog_service.shared.infra.in.web.exception;
 
-import com.ecommerce.catalog_service.shared.domain.exception.BusinessRuleViolationException;
-import com.ecommerce.catalog_service.shared.domain.exception.ImageLimitExceededException;
-import com.ecommerce.catalog_service.shared.domain.exception.ResourceNotFoundException;
-import com.ecommerce.catalog_service.shared.domain.exception.UnauthorizedSellerException;
+import com.ecommerce.catalog_service.shared.domain.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,6 +47,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException ex) {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    // Servidores caidos -> 503 Service Unaivailable
+    @ExceptionHandler(ExternalServiceIntegrationException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalStateException(ExternalServiceIntegrationException ex) {
+        return buildErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
     // Metodo auxiliar para construir un JSON de error estandarizado

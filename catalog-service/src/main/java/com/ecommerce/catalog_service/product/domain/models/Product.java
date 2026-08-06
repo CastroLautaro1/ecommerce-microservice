@@ -1,5 +1,6 @@
 package com.ecommerce.catalog_service.product.domain.models;
 
+import com.ecommerce.catalog_service.shared.domain.exception.BusinessRuleViolationException;
 import com.ecommerce.catalog_service.shared.domain.exception.ImageLimitExceededException;
 import com.ecommerce.catalog_service.shared.domain.exception.UnauthorizedSellerException;
 
@@ -11,8 +12,8 @@ import java.util.List;
 public class Product {
 
     private Long id;
-    private String name;
-    private String description;
+    private ProductName name;
+    private ProductDescription description;
     private Price price; // Uso del Value Object
     private Long sellerId; // Identificador del vendedor (Marketplace)
     private Long categoryId;
@@ -23,10 +24,9 @@ public class Product {
     private static final int MAX_IMAGES_ALLOWED = 5;
 
     // Factory Method para la creacion de un Producto
-    public static Product registerProduct(String name, String description, Price price, Long sellerId, Long categoryId) {
-        validateName(name);
-        if (sellerId == null) throw new IllegalArgumentException("El producto debe pertenecer a un vendedor");
-        if (categoryId == null) throw new IllegalArgumentException("El producto debe tener una categoría asociada");
+    public static Product registerProduct(ProductName name, ProductDescription description, Price price, Long sellerId, Long categoryId) {
+        if (sellerId == null) throw new BusinessRuleViolationException("El producto debe pertenecer a un vendedor");
+        if (categoryId == null) throw new BusinessRuleViolationException("El producto debe tener una categoría asociada");
 
         return new Product(
                 null,
@@ -42,7 +42,7 @@ public class Product {
     }
 
     // Constructor para reconstituir el producto desde la Base de Datos
-    public Product(Long id, String name, String description, Price price, Long sellerId,
+    public Product(Long id, ProductName name, ProductDescription description, Price price, Long sellerId,
                    Long categoryId, List<ProductImage> images, boolean active, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
@@ -67,11 +67,10 @@ public class Product {
         this.active = false;
     }
 
-    public void updateDetails(String newName, String newDescription, Price newPrice, Long newCategoryId, Long requestingUserId) {
+    public void updateDetails(ProductName newName, ProductDescription newDescription, Price newPrice, Long newCategoryId, Long requestingUserId) {
         verifyOwnership(requestingUserId);
-        validateName(newName);
-        if (newCategoryId == null) throw new IllegalArgumentException("El producto debe tener una categoría asociada");
-        if (newPrice == null) throw new IllegalArgumentException("El precio es obligatorio");
+        if (newCategoryId == null) throw new BusinessRuleViolationException("El producto debe tener una categoría asociada");
+        if (newPrice == null) throw new BusinessRuleViolationException("El precio es obligatorio");
 
         this.name = newName;
         this.description = newDescription;
@@ -135,12 +134,6 @@ public class Product {
 
     // --- MÉTODOS DE PROTECCIÓN INTERNA ---
 
-    private static void validateName(String name) {
-        if (name == null || name.trim().length() < 3) {
-            throw new IllegalArgumentException("El nombre del producto debe tener al menos 3 caracteres");
-        }
-    }
-
     private void verifyOwnership(Long userId) {
         if (!this.sellerId.equals(userId)) {
             // Regla de Marketplace: Solo el dueño puede mutar el producto
@@ -151,8 +144,8 @@ public class Product {
     // --- GETTERS (Solo para lectura en la capa de persistencia/presentación) ---
 
     public Long getId() { return id; }
-    public String getName() { return name; }
-    public String getDescription() { return description; }
+    public String getName() { return name.value(); }
+    public String getDescription() { return description.value(); }
     public Price getPrice() { return price; }
     public Long getSellerId() { return sellerId; }
     public Long getCategoryId() { return categoryId; }

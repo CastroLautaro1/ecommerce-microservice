@@ -1,12 +1,14 @@
 package com.ecommerce.catalog_service.product.domain.models;
 
+import com.ecommerce.catalog_service.shared.domain.exception.BusinessRuleViolationException;
+
 public record ProductImage(String url, boolean isMain) {
     public ProductImage {
         if (url == null || url.trim().isEmpty()) {
-            throw new IllegalArgumentException("La URL de la imagen es obligatoria");
+            throw new BusinessRuleViolationException("La URL de la imagen es obligatoria");
         }
         if (!url.startsWith("http")) {
-            throw new IllegalArgumentException("La URL de la imagen debe ser un enlace válido");
+            throw new BusinessRuleViolationException("La URL de la imagen debe ser un enlace válido");
         }
     }
 

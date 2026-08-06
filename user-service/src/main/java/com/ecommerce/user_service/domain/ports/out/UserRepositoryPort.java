@@ -20,4 +20,7 @@ public interface UserRepositoryPort {
     boolean existsByUsername(String username);
     boolean existsByDocumentNumberAndIdNot(String documentNumber, Long userId);
     boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long userId);
+
+    // Para Busquedas
+    Optional<Boolean> existsAndIsActive(Long userId);
 }

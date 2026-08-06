@@ -117,4 +117,14 @@ public class UserController {
         // Mapeamos el modelo de dominio al DTO de respuesta
         return ResponseEntity.ok(UserProfileResponse.fromDomain(user));
     }
+
+    // Endpoint usado por el Catalog-Service para validar la existencia del vendedor
+    @GetMapping("/{userId}/user-status")
+    public ResponseEntity<UserStatusResponse> getUserStatus(@PathVariable Long userId) {
+        // Si el usuario no existe devolvera un 404, el Catalog-Service validara si está activo
+        boolean isActive = userQueryUseCases.existsAndIsActive(userId);
+
+        UserStatusResponse response = new UserStatusResponse(userId, isActive);
+        return ResponseEntity.ok(response);
+    }
 }

@@ -4,4 +4,5 @@ import com.ecommerce.user_service.domain.models.User;
 
 public interface UserQueryUseCases {
     User getProfile(Long userId);
+    boolean existsAndIsActive(Long userId);
 }

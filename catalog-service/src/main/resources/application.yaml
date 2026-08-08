@@ -21,3 +21,21 @@ application:
   services:
     user:
       url: ${USER_SERVICE_URL}
+
+feign:
+  circuitbreaker:
+    enabled: true # Integración nativa de Feign con Resilience4j
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService: # Nombre de la instancia
+        registerHealthIndicator: true
+        slidingWindowSize: 10 # Evalua las ultimas 10 peticiones
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+  timelimiter:
+    instances:
+      userService:
+        timeoutDuration: 2s # Fast-Fail: Si tarda mas de 2 segundos, lo cuenta como fallo

@@ -18,11 +18,13 @@ public class CreateProductService implements CreateProductUseCase {
     private final ProductRepositoryPort productRepository;
     private final CategoryValidationPort categoryValidation;
     private final SellerValidationPort sellerValidation;
+    private final ProductRepositoryPort productRepositoryPort;
 
-    public CreateProductService(ProductRepositoryPort productRepository, CategoryValidationPort categoryValidation, SellerValidationPort sellerValidation) {
+    public CreateProductService(ProductRepositoryPort productRepository, CategoryValidationPort categoryValidation, SellerValidationPort sellerValidation, ProductRepositoryPort productRepositoryPort) {
         this.productRepository = productRepository;
         this.categoryValidation = categoryValidation;
         this.sellerValidation = sellerValidation;
+        this.productRepositoryPort = productRepositoryPort;
     }
 
     @Override
@@ -49,8 +51,10 @@ public class CreateProductService implements CreateProductUseCase {
         return productRepository.save(newProduct);
     }
 
-    // Crear metodo para validar unicidad del nombre
     private void validateProductUniqueness(String rawName) {
+        if(productRepositoryPort.existsByName(rawName)) {
+            throw new BusinessRuleViolationException("El nombre ingresado ya esta en uso por otro Producto.");
+        }
     }
 
     private void validateCategory(Long categoryId) {

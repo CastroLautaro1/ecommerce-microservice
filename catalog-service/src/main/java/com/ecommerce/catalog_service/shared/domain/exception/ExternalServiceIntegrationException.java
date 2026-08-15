@@ -4,4 +4,8 @@ public class ExternalServiceIntegrationException extends RuntimeException {
     public ExternalServiceIntegrationException(String message, Exception e) {
         super(message);
     }
+
+    public ExternalServiceIntegrationException(String message) {
+        super(message);
+    }
 }

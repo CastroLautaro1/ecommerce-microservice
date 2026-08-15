@@ -62,4 +62,14 @@ public class ProductPersistenceAdapter implements ProductRepositoryPort {
                 .map(productMapper::toDomainModel)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean existsByName(String name) {
+        return jpaRepository.existsByName(name);
+    }
+
+    @Override
+    public boolean existsByNameAndIdNot(String name, Long excludedId) {
+        return jpaRepository.existsByNameAndIdNot(name, excludedId);
+    }
 }

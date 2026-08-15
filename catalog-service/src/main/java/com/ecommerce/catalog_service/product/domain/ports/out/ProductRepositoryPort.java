@@ -14,4 +14,6 @@ public interface ProductRepositoryPort {
     List<Product> findActiveProductsByCategory(Long categoryId);
     List<Product> searchActiveProductsByName(String keyword);
     List<Product> findActiveProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice);
+    boolean existsByName(String name); // Para crear un Producto
+    boolean existsByNameAndIdNot(String name, Long excludedId); // Para actualizar un Producto
 }

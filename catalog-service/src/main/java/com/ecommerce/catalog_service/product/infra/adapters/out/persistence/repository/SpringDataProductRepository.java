@@ -21,4 +21,7 @@ public interface SpringDataProductRepository extends JpaRepository<ProductJpaEnt
 
     // Cumple con el requisito: filtrar productos activos por un rango de precios
     List<ProductJpaEntity> findByPriceAmountBetweenAndActiveTrue(BigDecimal minPrice, BigDecimal maxPrice);
+
+    boolean existsByName(String name);
+    boolean existsByNameAndIdNot(String name, Long id);
 }

@@ -4,6 +4,7 @@ import com.ecommerce.catalog_service.product.domain.ports.out.SellerValidationPo
 import com.ecommerce.catalog_service.product.infra.adapters.out.network.feign.ports.UserFeignClient;
 import com.ecommerce.catalog_service.shared.domain.exception.ExternalServiceIntegrationException;
 import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +17,7 @@ public class UserClientAdapter implements SellerValidationPort {
     }
 
     @Override
+    @CircuitBreaker(name = "userService", fallbackMethod = "fallbackForSellerValidation")
     public boolean isValidSeller(Long sellerId) {
         try {
             var response = userFeignClient.getSellerStatus(sellerId);
@@ -26,11 +28,15 @@ public class UserClientAdapter implements SellerValidationPort {
                     && response.getBody().isActiveSeller();
 
         } catch (FeignException.NotFound e) {
-            // Si el user-service deuvuelve un 404 retornamos false
+            // Si el user-service devuelve un 404 retornamos false
             return false;
-        } catch (FeignException e) {
-            // Excepcion tecnica en caso de caidas de red de parte del user-service
-            throw new ExternalServiceIntegrationException("Error de comunicación validando el estado del vendedor", e);
         }
+    }
+
+    public boolean fallbackForSellerValidation(Long sellerId, Throwable throwable) {
+        // Excepción tecnica que se mapea a un HTTP 503
+        throw new ExternalServiceIntegrationException(
+                "El servicio de validación de usuarios no se encuentra disponible temporalmente. Por favor, intente nuevamente."
+        );
     }
 }

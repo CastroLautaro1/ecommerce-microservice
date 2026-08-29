@@ -1,3 +1,86 @@
+# debug: true
+
+server:
+  port: 9090
+
 spring:
   application:
     name: api-gateway
+  main:
+    # ProhIbe el arranque de Tomcat/MVC
+    web-application-type: reactive
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # URI para que Spring descargue el JWKS, donde estan las claves publicas
+          issuer-uri: http://localhost:8080/realms/ecommerce-realm
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:4200"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                  - PATCH
+                allowedHeaders:
+                  - "Authorization"
+                  - "Content-Type"
+                allowCredentials: true
+                maxAge: 3600
+          routes:
+            - id: catalog-service-route
+              uri: lb://CATALOG-SERVICE
+              predicates:
+                - Path=/api/v1/products, /api/v1/products/**, /api/v1/categories/**, /api/v1/categories
+
+            - id: user-service-route
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/users/**
+
+            - id: inventory-service-route
+              uri: lb://inventory-service
+              predicates:
+                - Path=/api/v1/inventories/**
+
+            - id: order-service-route
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/orders/**
+
+# Configuración del Cliente de Eureka
+eureka:
+  client:
+    register-with-eureka: true # El Gateway se registra a sí mismo
+    fetch-registry: true # Descarga el mapa de IPs de los otros servicios
+    service-url:
+      defaultZone: http://localhost:8761/eureka/ # Puerto del Eureka Server
+  instance:
+    # Fuerza el uso de la IP en lugar del hostname del sistema operativo
+    prefer-ip-address: true
+    # Quema la IP local explícitamente para el entorno de desarrollo
+    ip-address: 127.0.0.1
+    hostname: localhost
+    # Sobreescritura del Identificador de Instancia (Elimina la dependencia de InetUtils)
+    instance-id: localhost:${spring.application.name}:${server.port}
+
+management:
+  server:
+    port: 9091 # Puerto privado aislado, accesible solo por la intranet
+  endpoints:
+    web:
+      exposure:
+        include: "*" # Es seguro exponer todo, porque vive en un puerto oculto al exterior
+  endpoint:
+    gateway:
+      enabled: true

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class Product {
 
@@ -15,7 +16,7 @@ public class Product {
     private ProductName name;
     private ProductDescription description;
     private Price price; // Uso del Value Object
-    private Long sellerId; // Identificador del vendedor (Marketplace)
+    private UUID sellerId; // Identificador del vendedor (Marketplace)
     private Long categoryId;
     private List<ProductImage> images;
     private boolean active;
@@ -24,7 +25,7 @@ public class Product {
     private static final int MAX_IMAGES_ALLOWED = 5;
 
     // Factory Method para la creacion de un Producto
-    public static Product registerProduct(ProductName name, ProductDescription description, Price price, Long sellerId, Long categoryId) {
+    public static Product registerProduct(ProductName name, ProductDescription description, Price price, UUID sellerId, Long categoryId) {
         if (sellerId == null) throw new BusinessRuleViolationException("El producto debe pertenecer a un vendedor");
         if (categoryId == null) throw new BusinessRuleViolationException("El producto debe tener una categoría asociada");
 
@@ -42,7 +43,7 @@ public class Product {
     }
 
     // Constructor para reconstituir el producto desde la Base de Datos
-    public Product(Long id, ProductName name, ProductDescription description, Price price, Long sellerId,
+    public Product(Long id, ProductName name, ProductDescription description, Price price, UUID sellerId,
                    Long categoryId, List<ProductImage> images, boolean active, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
@@ -57,17 +58,17 @@ public class Product {
 
     // --- COMPORTAMIENTO DEL DOMINIO (Reglas de Negocio) ---
 
-    public void updatePrice(Price newPrice, Long requestingUserId) {
+    public void updatePrice(Price newPrice, UUID requestingUserId) {
         verifyOwnership(requestingUserId);
         this.price = newPrice;
     }
 
-    public void deactivate(Long requestingUserId) {
+    public void deactivate(UUID requestingUserId) {
         verifyOwnership(requestingUserId);
         this.active = false;
     }
 
-    public void updateDetails(ProductName newName, ProductDescription newDescription, Price newPrice, Long newCategoryId, Long requestingUserId) {
+    public void updateDetails(ProductName newName, ProductDescription newDescription, Price newPrice, Long newCategoryId, UUID requestingUserId) {
         verifyOwnership(requestingUserId);
         if (newCategoryId == null) throw new BusinessRuleViolationException("El producto debe tener una categoría asociada");
         if (newPrice == null) throw new BusinessRuleViolationException("El precio es obligatorio");
@@ -78,7 +79,7 @@ public class Product {
         this.categoryId = newCategoryId;
     }
 
-    public void replaceImages(List<String> newImageUrls, Long requestingUserId) {
+    public void replaceImages(List<String> newImageUrls, UUID requestingUserId) {
         verifyOwnership(requestingUserId);
 
         // Vaciamos la galería actual
@@ -98,7 +99,7 @@ public class Product {
      * Regla de Negocio Compleja: Agregar una imagen.
      * Si la nueva es principal, las demás dejan de serlo.
      */
-    public void addImage(String url, boolean isMain, Long requestingUserId) {
+    public void addImage(String url, boolean isMain, UUID requestingUserId) {
         verifyOwnership(requestingUserId);
 
         if (this.images.size() >= MAX_IMAGES_ALLOWED) {
@@ -120,7 +121,7 @@ public class Product {
         this.images.add(new ProductImage(url, isMain));
     }
 
-    public void removeImage(String url, Long requestingUserId) {
+    public void removeImage(String url, UUID requestingUserId) {
         verifyOwnership(requestingUserId);
         this.images.removeIf(img -> img.url().equals(url));
 
@@ -134,7 +135,7 @@ public class Product {
 
     // --- MÉTODOS DE PROTECCIÓN INTERNA ---
 
-    private void verifyOwnership(Long userId) {
+    private void verifyOwnership(UUID userId) {
         if (!this.sellerId.equals(userId)) {
             // Regla de Marketplace: Solo el dueño puede mutar el producto
             throw new UnauthorizedSellerException(userId, this.id);
@@ -147,7 +148,7 @@ public class Product {
     public String getName() { return name.value(); }
     public String getDescription() { return description.value(); }
     public Price getPrice() { return price; }
-    public Long getSellerId() { return sellerId; }
+    public UUID getSellerId() { return sellerId; }
     public Long getCategoryId() { return categoryId; }
     public boolean isActive() { return active; }
     public LocalDateTime getCreatedAt() { return createdAt; }

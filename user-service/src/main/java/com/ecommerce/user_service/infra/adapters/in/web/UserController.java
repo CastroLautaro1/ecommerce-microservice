@@ -6,6 +6,7 @@ import com.ecommerce.user_service.domain.ports.in.*;
 import com.ecommerce.user_service.infra.adapters.in.web.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -68,6 +69,7 @@ public class UserController {
     }
 
     // Usamos "/me" y capturamos la cabecera para prevenir el IDOR
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/me/profile")
     public ResponseEntity<Void> updateProfile(
             @RequestHeader("X-User-Id") UUID authenticatedUserId,
@@ -83,6 +85,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping("/me/password")
     public ResponseEntity<Void> updatePassword(
             @RequestHeader("X-User-Id") UUID requestingUserId,
@@ -97,6 +100,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping("/me/email")
     public ResponseEntity<Void> updateEmail(
             @RequestHeader("X-User-Id") UUID requestingUserId,
@@ -110,6 +114,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/me")
     public ResponseEntity<Void> deactivateAccount(
             @RequestHeader("X-User-Id") UUID authenticatedUserId) {
@@ -118,6 +123,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/me/profile")
     public ResponseEntity<UserProfileResponse> getProfile(@RequestHeader("X-User-Id") UUID authenticatedUserId) {
         User user = userQueryUseCases.getProfile(authenticatedUserId);

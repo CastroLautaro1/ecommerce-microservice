@@ -3,6 +3,7 @@ package com.ecommerce.catalog_service.shared.infra.in.web.exception;
 import com.ecommerce.catalog_service.shared.domain.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -53,6 +54,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalServiceIntegrationException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalStateException(ExternalServiceIntegrationException ex) {
         return buildErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
+
+    // Permisos o roles no autorizados -> 403 Forbidden
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     // Metodo auxiliar para construir un JSON de error estandarizado

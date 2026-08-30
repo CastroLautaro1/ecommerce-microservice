@@ -4,8 +4,10 @@ import com.ecommerce.user_service.domain.models.PersonalInfo;
 import com.ecommerce.user_service.domain.models.TaxStatus;
 import com.ecommerce.user_service.domain.models.User;
 
+import java.util.UUID;
+
 public record UserProfileResponse(
-        Long id,
+        UUID id,
         String username,
         String email,
         boolean active,

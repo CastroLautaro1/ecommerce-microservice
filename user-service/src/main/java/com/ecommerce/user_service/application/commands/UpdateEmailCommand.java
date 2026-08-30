@@ -1,7 +1,9 @@
 package com.ecommerce.user_service.application.commands;
 
+import java.util.UUID;
+
 public record UpdateEmailCommand(
-        Long userId,
+        UUID userId,
         String newEmail
 ) {
 }

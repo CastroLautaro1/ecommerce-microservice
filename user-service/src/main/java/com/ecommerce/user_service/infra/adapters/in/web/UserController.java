@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("api/v1/users")
 public class UserController {
@@ -44,7 +46,7 @@ public class UserController {
                 request.email(),
                 request.password()
         );
-        Long newUserId = registerUserUseCase.execute(command);
+        UUID newUserId = registerUserUseCase.execute(command);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new UserResponse(newUserId, request.firstName(), request.lastName(), request.email()));
@@ -68,7 +70,7 @@ public class UserController {
     // Usamos "/me" y capturamos la cabecera para prevenir el IDOR
     @PutMapping("/me/profile")
     public ResponseEntity<Void> updateProfile(
-            @RequestHeader("X-User-Id") Long authenticatedUserId,
+            @RequestHeader("X-User-Id") UUID authenticatedUserId,
             @RequestBody UpdateProfileRequest request) {
 
         UpdateProfileCommand command = new UpdateProfileCommand(
@@ -82,9 +84,12 @@ public class UserController {
     }
 
     @PatchMapping("/me/password")
-    public ResponseEntity<Void> updatePassword(@RequestBody UpdatePasswordRequest request) {
+    public ResponseEntity<Void> updatePassword(
+            @RequestHeader("X-User-Id") UUID requestingUserId,
+            @RequestBody UpdatePasswordRequest request
+    ) {
         UpdatePasswordCommand command = new UpdatePasswordCommand(
-                request.userId(),
+                requestingUserId,
                 request.currentPassword(),
                 request.newPassword()
         );
@@ -93,9 +98,12 @@ public class UserController {
     }
 
     @PatchMapping("/me/email")
-    public ResponseEntity<Void> updateEmail(@RequestBody UpdateEmailRequest request) {
+    public ResponseEntity<Void> updateEmail(
+            @RequestHeader("X-User-Id") UUID requestingUserId,
+            @RequestBody UpdateEmailRequest request
+    ) {
         UpdateEmailCommand command = new UpdateEmailCommand(
-                request.userId(),
+                requestingUserId,
                 request.newEmail()
         );
         updateEmailUseCase.execute(command);
@@ -104,14 +112,14 @@ public class UserController {
 
     @DeleteMapping("/me")
     public ResponseEntity<Void> deactivateAccount(
-            @RequestHeader("X-User-Id") Long authenticatedUserId) {
+            @RequestHeader("X-User-Id") UUID authenticatedUserId) {
 
         deactivateAccountUseCase.execute(authenticatedUserId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me/profile")
-    public ResponseEntity<UserProfileResponse> getProfile(@RequestHeader("X-User-Id") Long authenticatedUserId) {
+    public ResponseEntity<UserProfileResponse> getProfile(@RequestHeader("X-User-Id") UUID authenticatedUserId) {
         User user = userQueryUseCases.getProfile(authenticatedUserId);
 
         // Mapeamos el modelo de dominio al DTO de respuesta
@@ -120,7 +128,7 @@ public class UserController {
 
     // Endpoint usado por el Catalog-Service para validar la existencia del vendedor
     @GetMapping("/{userId}/user-status")
-    public ResponseEntity<UserStatusResponse> getUserStatus(@PathVariable Long userId) {
+    public ResponseEntity<UserStatusResponse> getUserStatus(@PathVariable UUID userId) {
         // Si el usuario no existe devolvera un 404, el Catalog-Service validara si está activo
         boolean isActive = userQueryUseCases.existsAndIsActive(userId);
 

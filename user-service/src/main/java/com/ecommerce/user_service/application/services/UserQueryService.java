@@ -7,6 +7,8 @@ import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @Transactional(readOnly = true)
 public class UserQueryService implements UserQueryUseCases {
@@ -18,13 +20,13 @@ public class UserQueryService implements UserQueryUseCases {
     }
 
     @Override
-    public User getProfile(Long userId) {
+    public User getProfile(UUID userId) {
         return userRepository.findActiveById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     @Override
-    public boolean existsAndIsActive(Long userId) {
+    public boolean existsAndIsActive(UUID userId) {
         return userRepository.existsAndIsActive(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }

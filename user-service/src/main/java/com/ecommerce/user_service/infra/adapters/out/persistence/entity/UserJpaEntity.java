@@ -7,14 +7,15 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 public class UserJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -62,7 +63,7 @@ public class UserJpaEntity {
     public UserJpaEntity() {
     }
 
-    public UserJpaEntity(Long id, String username, String email, String passwordHash, Role role, PersonalInfoEmbeddable personalInfo, TaxStatus taxStatus, List<AddressJpaEntity> addresses, List<SavedPaymentMethodJpaEntity> paymentMethods, boolean active, LocalDateTime createdAt) {
+    public UserJpaEntity(UUID id, String username, String email, String passwordHash, Role role, PersonalInfoEmbeddable personalInfo, TaxStatus taxStatus, List<AddressJpaEntity> addresses, List<SavedPaymentMethodJpaEntity> paymentMethods, boolean active, LocalDateTime createdAt) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -76,11 +77,11 @@ public class UserJpaEntity {
         this.createdAt = createdAt;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

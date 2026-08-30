@@ -8,6 +8,7 @@ import com.ecommerce.user_service.infra.adapters.out.persistence.repository.Spri
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class UserRepositoryAdapter implements UserRepositoryPort {
@@ -39,13 +40,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(UUID id) {
         return jpaRepository.findById(id)
                 .map(mapper::toDomainModel);
     }
 
     @Override
-    public Optional<User> findActiveById(Long id) {
+    public Optional<User> findActiveById(UUID id) {
         return jpaRepository.findByIdAndActiveTrue(id)
                 .map(mapper::toDomainModel);
     }
@@ -61,17 +62,17 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public boolean existsByDocumentNumberAndIdNot(String documentNumber, Long userId) {
+    public boolean existsByDocumentNumberAndIdNot(String documentNumber, UUID userId) {
         return jpaRepository.existsByPersonalInfo_DocumentNumberAndIdNot(documentNumber, userId);
     }
 
     @Override
-    public boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long userId) {
+    public boolean existsByPhoneNumberAndIdNot(String phoneNumber, UUID userId) {
         return jpaRepository.existsByPersonalInfo_PhoneNumberAndIdNot(phoneNumber, userId);
     }
 
     @Override
-    public Optional<Boolean> existsAndIsActive(Long userId) {
+    public Optional<Boolean> existsAndIsActive(UUID userId) {
         return jpaRepository.findActiveStatusById(userId);
     }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "products")
@@ -24,7 +25,7 @@ public class ProductJpaEntity {
     private PriceEmbeddable price;
 
     @Column(name = "seller_id", nullable = false)
-    private Long sellerId;
+    private UUID sellerId;
 
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
@@ -73,11 +74,11 @@ public class ProductJpaEntity {
         this.price = price;
     }
 
-    public Long getSellerId() {
+    public UUID getSellerId() {
         return sellerId;
     }
 
-    public void setSellerId(Long sellerId) {
+    public void setSellerId(UUID sellerId) {
         this.sellerId = sellerId;
     }
 

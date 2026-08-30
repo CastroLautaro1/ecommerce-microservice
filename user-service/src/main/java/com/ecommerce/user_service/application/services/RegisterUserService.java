@@ -25,7 +25,7 @@ public class RegisterUserService implements RegisterUserUseCase {
 
     @Override
     @Transactional
-    public Long execute(RegisterUserCommand command) {
+    public UUID execute(RegisterUserCommand command) {
         if (userRepository.existsByEmail(command.email())) {
             throw new UserAlreadyExistsException("Este correo electrónico ya se encuentra registrado. Por favor, inicia sesión.");
         }

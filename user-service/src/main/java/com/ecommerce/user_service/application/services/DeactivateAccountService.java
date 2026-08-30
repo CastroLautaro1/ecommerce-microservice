@@ -7,6 +7,8 @@ import com.ecommerce.user_service.domain.ports.out.UserRepositoryPort;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class DeactivateAccountService implements DeactivateAccountUseCase {
 
@@ -18,7 +20,7 @@ public class DeactivateAccountService implements DeactivateAccountUseCase {
 
     @Override
     @Transactional
-    public void execute(Long userId) {
+    public void execute(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
 

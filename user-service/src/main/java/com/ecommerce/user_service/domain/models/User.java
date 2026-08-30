@@ -6,10 +6,11 @@ import com.ecommerce.user_service.domain.exceptions.DomainValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class User {
-    private Long id;
+    private UUID id;
     private String username;
     private String email;
     private String passwordHash;
@@ -28,7 +29,7 @@ public class User {
     private static final Pattern PASSWORD_COMPLEXITY_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_\\-.])[A-Za-z\\d@$!%*?&_\\-.]{8,30}$");
 
     // Constructor all-args para reconstitucion
-    public User(Long id, String username, String email, String passwordHash, Role role,
+    public User(UUID id, String username, String email, String passwordHash, Role role,
                 PersonalInfo personalInfo, TaxStatus taxStatus, List<Address> addresses,
                 List<SavedPaymentMethod> paymentMethods, boolean active, LocalDateTime createdAt) {
         this.id = id;
@@ -183,7 +184,7 @@ public class User {
     }
 
     // GETTERS
-    public Long getId() { return id; }
+    public UUID getId() { return id; }
 
     public String getUsername() { return username; }
 

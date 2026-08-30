@@ -7,6 +7,8 @@ import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class UserClientAdapter implements SellerValidationPort {
 
@@ -18,7 +20,7 @@ public class UserClientAdapter implements SellerValidationPort {
 
     @Override
     @CircuitBreaker(name = "userService", fallbackMethod = "fallbackForSellerValidation")
-    public boolean isValidSeller(Long sellerId) {
+    public boolean isValidSeller(UUID sellerId) {
         try {
             var response = userFeignClient.getSellerStatus(sellerId);
 

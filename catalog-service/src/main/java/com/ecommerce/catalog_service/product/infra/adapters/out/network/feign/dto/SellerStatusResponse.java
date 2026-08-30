@@ -2,8 +2,10 @@ package com.ecommerce.catalog_service.product.infra.adapters.out.network.feign.d
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.UUID;
+
 public record SellerStatusResponse(
-        @JsonProperty("userId") Long sellerId,
+        @JsonProperty("userId") UUID sellerId,
         @JsonProperty("isActive") boolean isActiveSeller
 ) {
 }

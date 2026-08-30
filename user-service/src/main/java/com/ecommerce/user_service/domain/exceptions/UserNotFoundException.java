@@ -1,7 +1,9 @@
 package com.ecommerce.user_service.domain.exceptions;
 
+import java.util.UUID;
+
 public class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException(Long id) {
+    public UserNotFoundException(UUID id) {
         super("No se encontró ningún usuario con el ID: " + id);
     }
 

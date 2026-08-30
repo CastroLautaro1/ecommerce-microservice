@@ -2,9 +2,9 @@ package com.ecommerce.catalog_service.product.infra.adapters.in.web.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public record UpdateProductRequest(
-        Long requestingUserId,
         String name,
         String description,
         BigDecimal priceAmount,

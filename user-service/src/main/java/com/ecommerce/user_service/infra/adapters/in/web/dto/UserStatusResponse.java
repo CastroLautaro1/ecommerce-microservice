@@ -1,7 +1,9 @@
 package com.ecommerce.user_service.infra.adapters.in.web.dto;
 
+import java.util.UUID;
+
 public record UserStatusResponse(
-        Long userId,
+        UUID userId,
         boolean isActive
 ) {
 }

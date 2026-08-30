@@ -11,9 +11,11 @@ import com.ecommerce.catalog_service.product.domain.ports.in.ProductQueryUseCase
 import com.ecommerce.catalog_service.product.domain.ports.in.UpdateProductUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -37,21 +39,30 @@ public class ProductController {
 
     // --- COMANDOS (Mutaciones) ---
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody CreateProductRequest request) {
+    public ResponseEntity<?> createProduct(
+            @RequestBody CreateProductRequest request,
+            @RequestHeader("X-User-Id") UUID requestingUserId
+    ) {
         CreateProductCommand command = new CreateProductCommand(
                 request.name(), request.description(), request.priceAmount(),
-                request.priceCurrency(), request.sellerId(), request.categoryId(),
+                request.priceCurrency(), requestingUserId, request.categoryId(),
                 request.imageUrls()
         );
         var product = createProductUseCase.execute(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody UpdateProductRequest request) {
+    public ResponseEntity<?> updateProduct(
+            @PathVariable Long id,
+            @RequestBody UpdateProductRequest request,
+            @RequestHeader("X-User-Id") UUID requestingUserId
+    ) {
         UpdateProductCommand command = new UpdateProductCommand(
-                id, request.requestingUserId(), request.name(), request.description(),
+                id, requestingUserId, request.name(), request.description(),
                 request.priceAmount(), request.priceCurrency(), request.categoryId(),
                 request.imageUrls()
         );
@@ -59,8 +70,12 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deactivateProduct(@PathVariable Long id, @RequestParam Long requestingUserId) {
+    public ResponseEntity<Void> deactivateProduct(
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") UUID requestingUserId
+    ) {
         DeactivateProductCommand command = new DeactivateProductCommand(id, requestingUserId);
         deactivateProductUseCase.execute(command);
         return ResponseEntity.noContent().build(); // HTTP 204

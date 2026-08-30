@@ -11,6 +11,7 @@ import com.ecommerce.catalog_service.category.infra.adapters.in.web.dto.MoveCate
 import com.ecommerce.catalog_service.category.infra.adapters.in.web.dto.RenameCategoryRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,13 +32,15 @@ public class CategoryController {
         this.promoteCategoryToRoot = promoteCategoryToRoot;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createCategory(@RequestBody CreateCategoryRequest request) {
         Category category = createCategory.execute(new CreateCategoryCommand(request.name(), request.parentId()));
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
 
-    // Renombrar
+    // Renombrar categoria
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/name")
     public ResponseEntity<Void> rename(@PathVariable Long id, @RequestBody RenameCategoryRequest request) {
         renameCategory.execute(new RenameCategoryCommand(id, request.newName()));
@@ -45,6 +48,7 @@ public class CategoryController {
     }
 
     // Mover de jerarquía
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/parent")
     public ResponseEntity<Void> move(@PathVariable Long id, @RequestBody MoveCategoryRequest request) {
         moveCategory.execute(new MoveCategoryCommand(id, request.parentId()));
@@ -52,12 +56,14 @@ public class CategoryController {
     }
 
     // Promover a raíz (semanticamente se "elimina" la relacion con el padre)
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}/parent")
     public ResponseEntity<Void> promoteToRoot(@PathVariable Long id) {
         promoteCategoryToRoot.execute(new PromoteCategoryToRootCommand(id));
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         deactivateCategory.execute(id);

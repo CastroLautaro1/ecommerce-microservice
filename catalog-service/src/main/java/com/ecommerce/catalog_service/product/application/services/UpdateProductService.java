@@ -14,6 +14,8 @@ import com.ecommerce.catalog_service.shared.domain.exception.ResourceNotFoundExc
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UpdateProductService implements UpdateProductUseCase {
 
@@ -70,7 +72,7 @@ public class UpdateProductService implements UpdateProductUseCase {
         }
     }
 
-    private void validateSeller(Long sellerId) {
+    private void validateSeller(UUID sellerId) {
         if (!sellerValidation.isValidSeller(sellerId)) {
             throw new BusinessRuleViolationException("El identificador del vendedor no es válido o carece de permisos.");
         }

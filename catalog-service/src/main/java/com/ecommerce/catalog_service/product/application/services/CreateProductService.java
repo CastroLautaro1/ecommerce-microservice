@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CreateProductService implements CreateProductUseCase {
@@ -63,13 +64,13 @@ public class CreateProductService implements CreateProductUseCase {
         }
     }
 
-    private void validateSeller(Long sellerId) {
+    private void validateSeller(UUID sellerId) {
         if (!sellerValidation.isValidSeller(sellerId)) {
             throw new BusinessRuleViolationException("El identificador del vendedor no es válido o carece de permisos.");
         }
     }
 
-    private void processImages(Product product, List<String> imageUrls, Long sellerId) {
+    private void processImages(Product product, List<String> imageUrls, UUID sellerId) {
         if (imageUrls == null || imageUrls.isEmpty()) {
             return;
         }

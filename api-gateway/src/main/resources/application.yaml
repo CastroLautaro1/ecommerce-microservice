@@ -51,7 +51,8 @@ spring:
             - id: inventory-service-route
               uri: lb://inventory-service
               predicates:
-                - Path=/api/v1/inventories/**
+                - Path=/api/v1/inventories # Solo se permite el POST para crear un inventario
+                # - Path=/api/v1/inventories/**
 
             - id: order-service-route
               uri: lb://order-service

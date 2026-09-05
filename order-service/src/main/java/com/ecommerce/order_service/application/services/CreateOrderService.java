@@ -25,7 +25,7 @@ public class CreateOrderService {
 
     // Se invoca desde el orquestador
     @Transactional
-    public Order persistAndPublish(UUID orderId, Long userId, List<OrderItem> hydratedItems) {
+    public Order persistAndPublish(UUID orderId, UUID userId, List<OrderItem> hydratedItems) {
         if (orderRepository.findByOrderId(orderId).isPresent()) {
             throw new DomainValidationException("La orden con UUID " + orderId + " ya fue procesada.");
         }

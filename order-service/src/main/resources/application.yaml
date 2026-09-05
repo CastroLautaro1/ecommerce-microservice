@@ -4,6 +4,25 @@ server:
 spring:
   application:
     name: order-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ecommerce-realm
+
+      # Configuración como Cliente (Para enviar peticiones al Inventory-Service)
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/ecommerce-realm
+        registration:
+          order-service-client:
+            provider: keycloak
+            client-id: order-service
+            client-secret: ${KEYCLOAK_ORDER_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+            # BLINDAJE: Fuerza el envío de credenciales en la cabecera (Estándar Keycloak)
+            client-authentication-method: client_secret_post
 
   profiles:
     active: local
@@ -28,3 +47,14 @@ application:
       url: ${CATALOG_SERVICE_URL}
     inventory:
       url: ${INVENTORY_SERVICE_URL}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    hostname: localhost
+    # Sobreescritura del Identificador de Instancia (Elimina la dependencia de InetUtils)
+    instance-id: localhost:${spring.application.name}:${server.port}

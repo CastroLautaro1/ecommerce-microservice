@@ -1,14 +1,14 @@
-# debug: true
-
 server:
   port: 9090
 
 spring:
   application:
     name: api-gateway
+
   main:
     # ProhIbe el arranque de Tomcat/MVC
     web-application-type: reactive
+
   security:
     oauth2:
       resourceserver:
@@ -51,12 +51,13 @@ spring:
             - id: inventory-service-route
               uri: lb://inventory-service
               predicates:
-                - Path=/api/v1/inventories/**
+                - Path=/api/v1/inventories # Solo se permite el POST para crear un Inventario
+                # - Path=/api/v1/inventories/**
 
             - id: order-service-route
               uri: lb://order-service
               predicates:
-                - Path=/api/v1/orders/**
+                - Path=/api/v1/orders # Solo se permite el POST para crear la Orden
 
 # Configuración del Cliente de Eureka
 eureka:
@@ -73,6 +74,7 @@ eureka:
     hostname: localhost
     # Sobreescritura del Identificador de Instancia (Elimina la dependencia de InetUtils)
     instance-id: localhost:${spring.application.name}:${server.port}
+
 
 management:
   server:

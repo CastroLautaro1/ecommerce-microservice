@@ -10,6 +10,7 @@ import com.ecommerce.order_service.infra.adapters.in.web.dto.CreateOrderRequest;
 import com.ecommerce.order_service.infra.adapters.in.web.dto.OrderResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -29,12 +30,16 @@ public class OrderController {
         this.cancelOrderUseCase = cancelOrderUseCase;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
+    public ResponseEntity<OrderResponse> createOrder(
+            @RequestBody CreateOrderRequest request,
+            @RequestHeader("X-User-Id") UUID requestingUserId
+    ) {
         // Mapeo de DTO de Infraestructura a Command de Aplicación
         CreateOrderCommand command = new CreateOrderCommand(
                 UUID.randomUUID(), // Generamos el ID de la orden en la entrada
-                request.userId(),
+                requestingUserId,
                 request.items().stream()
                         .map(item -> new OrderItemCommand(item.productId(), item.quantity()))
                         .collect(Collectors.toList())
@@ -48,12 +53,14 @@ public class OrderController {
                 .body(new OrderResponse(order.getOrderId(), order.getStatus().name()));
     }
 
+    @PreAuthorize("hasRole('SYSTEM')")
     @PutMapping("/{orderId}/confirm")
     public ResponseEntity<Void> confirmOrder(@PathVariable UUID orderId) {
         confirmOrderUseCase.execute(orderId);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('SYSTEM')")
     @PutMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(@PathVariable UUID orderId) {
         cancelOrderUseCase.execute(orderId);

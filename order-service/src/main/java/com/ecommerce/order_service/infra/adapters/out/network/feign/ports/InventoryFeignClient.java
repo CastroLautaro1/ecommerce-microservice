@@ -1,5 +1,6 @@
 package com.ecommerce.order_service.infra.adapters.out.network.feign.ports;
 
+import com.ecommerce.common_security.FeignClientSecurityConfig;
 import com.ecommerce.order_service.infra.adapters.out.network.feign.dto.ReservationResponse;
 import com.ecommerce.order_service.infra.adapters.out.network.feign.dto.StockReservationRequest;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -10,7 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.UUID;
 
-@FeignClient(name = "inventory-service", url = "${application.services.inventory.url}")
+@FeignClient(
+        name = "inventory-service",
+        url = "${application.services.inventory.url}",
+        configuration = FeignClientSecurityConfig.class
+)
 public interface InventoryFeignClient {
 
     @PostMapping("/api/v1/inventories/reserve")

@@ -13,14 +13,14 @@ import java.util.UUID;
 public class Order {
     private Long id;
     private final UUID orderId; // UUID para Idempotencia
-    private final Long userId; // Id del comprador
+    private final UUID userId; // Id del comprador
     private OrderStatus status;
     private final Instant createdAt;
     private final List<OrderItem> items;
     private BigDecimal totalAmount;
 
     // Constructor para crear una nueva Orden
-    public static Order registerOrder(UUID orderId, Long userId, List<OrderItem> items) {
+    public static Order registerOrder(UUID orderId, UUID userId, List<OrderItem> items) {
         if (orderId == null) throw new DomainValidationException("El OrderId (UUID) es obligatorio para la idempotencia");
         if (userId == null) throw new DomainValidationException("El ID de usuario es obligatorio");
         if (items == null || items.isEmpty()) throw new DomainValidationException("La orden no puede estar vacía");
@@ -36,7 +36,7 @@ public class Order {
     }
 
     // Constructor para reconstruccion desde la BdD
-    public Order(Long id, UUID orderId, Long userId, OrderStatus status, Instant createdAt, List<OrderItem> items) {
+    public Order(Long id, UUID orderId, UUID userId, OrderStatus status, Instant createdAt, List<OrderItem> items) {
         this.id = id;
         this.orderId = orderId;
         this.userId = userId;
@@ -94,7 +94,7 @@ public class Order {
     // --- GETTERS ---
     public Long getId() { return id; }
     public UUID getOrderId() { return orderId; }
-    public Long getUserId() { return userId; }
+    public UUID getUserId() { return userId; }
     public OrderStatus getStatus() { return status; }
     public Instant getCreatedAt() { return createdAt; }
     public BigDecimal getTotalAmount() { return totalAmount; }

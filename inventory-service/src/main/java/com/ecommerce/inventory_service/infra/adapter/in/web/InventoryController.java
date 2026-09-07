@@ -11,6 +11,7 @@ import com.ecommerce.inventory_service.infra.adapter.in.web.dto.ReservationRespo
 import com.ecommerce.inventory_service.infra.adapter.in.web.dto.ReserveStockRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class InventoryController {
     }
 
     // Inicializar el inventario de un producto nuevo
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ResponseEntity<InventoryResponse> createInventory(@RequestBody CreateInventoryRequest request) {
         CreateInventoryCommand command = new CreateInventoryCommand(
@@ -51,6 +53,7 @@ public class InventoryController {
     }
 
     // Bloquear stock temporalmente (Llamado por el Order-Service en el Checkout)
+    @PreAuthorize("hasRole('SYSTEM')")
     @PostMapping("/reserve")
     public ResponseEntity<ReservationResponse> reserveStock(@RequestBody ReserveStockRequest request) {
         ReserveStockCommand command = new ReserveStockCommand(
@@ -71,6 +74,7 @@ public class InventoryController {
     }
 
     // Confirma reservas en bloque
+    @PreAuthorize("hasRole('SYSTEM')")
     @PutMapping("/orders/{orderId}/confirm")
     public ResponseEntity<Void> confirmOrderReservations(@PathVariable UUID orderId) {
         // Si no hay stock o hay un estado inválido, el dominio lanzará una excepción (ej. InsufficientTotalStockException)
@@ -80,6 +84,7 @@ public class InventoryController {
     }
 
     // Cancela reservas en bloque
+    @PreAuthorize("hasRole('SYSTEM')")
     @PutMapping("/orders/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrderReservations(@PathVariable UUID orderId) {
         // El caso de uso buscará todas las reservas de esta orden y las liberará atómicamente.

@@ -20,10 +20,10 @@ public class OrderJpaEntity {
     private UUID orderId;
 
     @Column(name = "user_id", nullable = false, updatable = false)
-    private Long userId;
+    private UUID userId;
 
-    @Column(name = "reservation_id")
-    private UUID reservationId;
+//    @Column(name = "reservation_id")
+//    private UUID reservationId;
 
     @Column(nullable = false)
     private String status;
@@ -41,11 +41,11 @@ public class OrderJpaEntity {
     public OrderJpaEntity() {
     }
 
-    public OrderJpaEntity(Long id, UUID orderId, Long userId, UUID reservationId, String status, Instant createdAt, BigDecimal totalAmount, List<OrderItemJpaEntity> items) {
+    public OrderJpaEntity(Long id, UUID orderId, UUID userId, String status, Instant createdAt, BigDecimal totalAmount, List<OrderItemJpaEntity> items) {
         this.id = id;
         this.orderId = orderId;
         this.userId = userId;
-        this.reservationId = reservationId;
+//      this.reservationId = reservationId;
         this.status = status;
         this.createdAt = createdAt;
         this.totalAmount = totalAmount;
@@ -82,21 +82,21 @@ public class OrderJpaEntity {
         this.orderId = orderId;
     }
 
-    public Long getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
-    public UUID getReservationId() {
-        return reservationId;
-    }
-
-    public void setReservationId(UUID reservationId) {
-        this.reservationId = reservationId;
-    }
+//    public UUID getReservationId() {
+//        return reservationId;
+//    }
+//
+//    public void setReservationId(UUID reservationId) {
+//        this.reservationId = reservationId;
+//    }
 
     public String getStatus() {
         return status;

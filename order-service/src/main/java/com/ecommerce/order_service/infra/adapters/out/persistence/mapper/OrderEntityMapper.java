@@ -23,7 +23,7 @@ public interface OrderEntityMapper {
     OrderItem toDomainOrderItem(OrderItemJpaEntity entity);
 
     // --- Creacion: Dominio Puro -> JPA (Nuevos Registros) ---
-    @Mapping(target = "reservationId", ignore = true)
+    //@Mapping(target = "reservationId", ignore = true)
     OrderJpaEntity toJpaEntity(Order domain);
 
     @Mapping(target = "order", ignore = true) // Evita bucle bidireccional en JPA

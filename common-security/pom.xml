@@ -29,10 +29,23 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<spring-cloud.version>2025.1.2</spring-cloud.version>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
-		<!-- Resource Server y Security para procesar JWTs -->
+		<!-- RESOURCE SERVER y SECURITY para procesar JWTs -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -46,7 +59,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<scope>provided</scope> <!-- Provisto por el microservicio consumidor -->
 		</dependency>
-		<!-- Tests -->
+		<!-- TESTING -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security-oauth2-resource-server-test</artifactId>
@@ -56,6 +69,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<!-- OAUTH2 CLIENT (Para que el ms actue como un usuario frente a Keycloak)-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+			<optional>true</optional><!-- Evita que se propague a los microservicios que no usan esta dependencia -->
+		</dependency>
+		<!-- FEIGN -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<optional>true</optional><!-- Evita que se propague a los microservicios que no usan esta dependencia -->
 		</dependency>
 	</dependencies>
 

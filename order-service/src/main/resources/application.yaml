@@ -4,25 +4,6 @@ server:
 spring:
   application:
     name: order-service
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8080/realms/ecommerce-realm
-
-      # Configuración como Cliente (Para enviar peticiones al Inventory-Service)
-      client:
-        provider:
-          keycloak:
-            issuer-uri: http://localhost:8080/realms/ecommerce-realm
-        registration:
-          order-service-client:
-            provider: keycloak
-            client-id: order-service
-            client-secret: ${KEYCLOAK_ORDER_CLIENT_SECRET}
-            authorization-grant-type: client_credentials
-            # BLINDAJE: Fuerza el envío de credenciales en la cabecera (Estándar Keycloak)
-            client-authentication-method: client_secret_post
 
   profiles:
     active: local
@@ -40,6 +21,26 @@ spring:
           order_inserts: true
           order_updates: true
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Permite descargar las llaves públicas de Keycloak
+          issuer-uri: http://localhost:8080/realms/ecommerce-realm
+
+      # Configuración como Cliente (Para enviar peticiones a otros servicios)
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/ecommerce-realm
+        registration:
+          order-service-client:
+            provider: keycloak
+            client-id: order-service
+            client-secret: ${KEYCLOAK_ORDER_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+            # BLINDAJE: Fuerza el envío de credenciales en la cabecera (Estándar Keycloak)
+            client-authentication-method: client_secret_post
 
 application:
   services:
@@ -48,6 +49,7 @@ application:
     inventory:
       url: ${INVENTORY_SERVICE_URL}
 
+# Cliente de Eureka
 eureka:
   client:
     service-url:

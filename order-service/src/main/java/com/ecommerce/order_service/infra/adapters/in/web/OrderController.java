@@ -53,12 +53,14 @@ public class OrderController {
                 .body(new OrderResponse(order.getOrderId(), order.getStatus().name()));
     }
 
+    @PreAuthorize("hasRole('SYSTEM')")
     @PutMapping("/{orderId}/confirm")
     public ResponseEntity<Void> confirmOrder(@PathVariable UUID orderId) {
         confirmOrderUseCase.execute(orderId);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('SYSTEM')")
     @PutMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(@PathVariable UUID orderId) {
         cancelOrderUseCase.execute(orderId);

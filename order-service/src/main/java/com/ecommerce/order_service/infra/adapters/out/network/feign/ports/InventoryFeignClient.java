@@ -1,6 +1,6 @@
 package com.ecommerce.order_service.infra.adapters.out.network.feign.ports;
 
-import com.ecommerce.order_service.infra.adapters.out.network.FeignClientSecurityConfig;
+import com.ecommerce.common_security.FeignClientSecurityConfig;
 import com.ecommerce.order_service.infra.adapters.out.network.feign.dto.ReservationResponse;
 import com.ecommerce.order_service.infra.adapters.out.network.feign.dto.StockReservationRequest;
 import org.springframework.cloud.openfeign.FeignClient;

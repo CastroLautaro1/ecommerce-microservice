@@ -24,11 +24,6 @@ spring:
           # Permite descargar las llaves públicas de Keycloak
           issuer-uri: http://localhost:8080/realms/ecommerce-realm
 
-application:
-  services:
-    user:
-      url: ${USER_SERVICE_URL}
-
 feign:
   circuitbreaker:
     enabled: true # Integración nativa de Feign con Resilience4j

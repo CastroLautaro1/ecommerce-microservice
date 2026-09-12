@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface SpringDataProductRepository extends JpaRepository<ProductJpaEntity, Long> {
@@ -24,4 +25,5 @@ public interface SpringDataProductRepository extends JpaRepository<ProductJpaEnt
 
     boolean existsByName(String name);
     boolean existsByNameAndIdNot(String name, Long id);
+    boolean existsByIdAndSellerIdAndActiveTrue(Long productId, UUID sellerId);
 }

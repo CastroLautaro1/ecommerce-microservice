@@ -30,7 +30,9 @@ public class GlobalExceptionHandler {
     // (Se agrupan la falta de stock y los intentos de modificar reservas ya confirmadas/expiradas)
     @ExceptionHandler({
             InsufficientStockException.class,
-            InvalidReservationStateException.class
+            InvalidReservationStateException.class,
+            InvalidProductOwnershipException.class,
+            BusinessRuleViolationException.class
     })
     public ResponseEntity<Map<String, Object>> handleConflictExceptions(
             RuntimeException ex,
@@ -55,8 +57,22 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST, request.getRequestURI());
     }
 
+    // Fallas de Red y Dependencias Externas -> 503 Service Unavailable
+    @ExceptionHandler(ExternalServiceUnavailableException.class)
+    public ResponseEntity<Map<String, Object>> handleExternalServiceFailures(
+            ExternalServiceUnavailableException ex,
+            HttpServletRequest request) {
+        ex.printStackTrace();
+
+        return buildErrorResponse("\"No se pudo validar la transacción debido a una falla temporal en los servicios internos.",
+                HttpStatus.SERVICE_UNAVAILABLE, request.getRequestURI());
+    }
+
     // Errores inesperados -> 500 Internal Server Error
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({
+            Exception.class,
+            ExternalServiceUnavailableException.class
+    })
     public ResponseEntity<Map<String, Object>> handleGenericException(
             Exception ex,
             HttpServletRequest request) {

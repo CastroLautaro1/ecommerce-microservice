@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -71,5 +72,10 @@ public class ProductPersistenceAdapter implements ProductRepositoryPort {
     @Override
     public boolean existsByNameAndIdNot(String name, Long excludedId) {
         return jpaRepository.existsByNameAndIdNot(name, excludedId);
+    }
+
+    @Override
+    public boolean existsByIdAndSellerIdAndIsActiveTrue(Long productId, UUID sellerId) {
+        return jpaRepository.existsByIdAndSellerIdAndActiveTrue(productId, sellerId);
     }
 }

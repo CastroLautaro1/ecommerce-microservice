@@ -4,6 +4,7 @@ import com.ecommerce.catalog_service.product.application.commands.CreateProductC
 import com.ecommerce.catalog_service.product.application.commands.DeactivateProductCommand;
 import com.ecommerce.catalog_service.product.application.commands.UpdateProductCommand;
 import com.ecommerce.catalog_service.product.infra.adapters.in.web.dto.CreateProductRequest;
+import com.ecommerce.catalog_service.product.infra.adapters.in.web.dto.OwnershipValidationResponse;
 import com.ecommerce.catalog_service.product.infra.adapters.in.web.dto.UpdateProductRequest;
 import com.ecommerce.catalog_service.product.domain.ports.in.CreateProductUseCase;
 import com.ecommerce.catalog_service.product.domain.ports.in.DeactivateProductUseCase;
@@ -108,5 +109,15 @@ public class ProductController {
             @RequestParam BigDecimal minPrice,
             @RequestParam BigDecimal maxPrice) {
         return ResponseEntity.ok(productQueryUseCase.filterByPriceRange(minPrice, maxPrice));
+    }
+
+    // Endpoint para que el Inventory-Service pueda validar que el producto existe y le pertence al vendedor
+    @GetMapping("/{id}/ownership")
+    public ResponseEntity<OwnershipValidationResponse> isProductOwnedBySeller(
+            @PathVariable("id") Long productId,
+            @RequestParam("sellerId") UUID sellerId
+    ) {
+        boolean isValid = productQueryUseCase.checkProductOwnership(productId, sellerId);
+        return ResponseEntity.ok(new OwnershipValidationResponse(isValid));
     }
 }

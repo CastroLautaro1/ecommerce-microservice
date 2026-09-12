@@ -1,0 +1,7 @@
+package com.ecommerce.inventory_service.domain.exceptions;
+
+public class ExternalServiceUnavailableException extends RuntimeException {
+  public ExternalServiceUnavailableException(String message, Throwable cause) {
+    super(message, cause);
+  }
+}

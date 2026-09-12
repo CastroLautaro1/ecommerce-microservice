@@ -40,14 +40,17 @@ public class InventoryController {
     // Inicializar el inventario de un producto nuevo
     @PreAuthorize("hasRole('USER')")
     @PostMapping
-    public ResponseEntity<InventoryResponse> createInventory(@RequestBody CreateInventoryRequest request) {
+    public ResponseEntity<InventoryResponse> createInventory(
+            @RequestBody CreateInventoryRequest request,
+            @RequestHeader("X-User-Id") UUID sellerId
+    ) {
         CreateInventoryCommand command = new CreateInventoryCommand(
                 request.productId(),
                 request.sku(),
                 request.initialStock()
         );
 
-        Inventory savedInventory = createInventoryUseCase.execute(command);
+        Inventory savedInventory = createInventoryUseCase.execute(command, sellerId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(InventoryResponse.fromDomain(savedInventory));
     }

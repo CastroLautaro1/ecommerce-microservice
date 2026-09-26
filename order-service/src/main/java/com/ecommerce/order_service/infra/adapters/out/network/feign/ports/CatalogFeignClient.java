@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "catalog-service",
-        url = "${application.services.catalog.url}",
         configuration = FeignClientSecurityConfig.class
 )
 public interface CatalogFeignClient {

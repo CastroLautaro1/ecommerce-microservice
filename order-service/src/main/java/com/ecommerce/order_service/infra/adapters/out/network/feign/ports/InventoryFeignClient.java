@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @FeignClient(
         name = "inventory-service",
-        url = "${application.services.inventory.url}",
         configuration = FeignClientSecurityConfig.class
 )
 public interface InventoryFeignClient {

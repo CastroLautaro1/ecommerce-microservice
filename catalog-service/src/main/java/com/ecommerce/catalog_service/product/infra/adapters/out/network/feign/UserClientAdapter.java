@@ -35,7 +35,7 @@ public class UserClientAdapter implements SellerValidationPort {
         }
     }
 
-    public boolean fallbackForSellerValidation(Long sellerId, Throwable throwable) {
+    public boolean fallbackForSellerValidation(UUID sellerId, Throwable throwable) {
         // Excepción tecnica que se mapea a un HTTP 503
         throw new ExternalServiceIntegrationException(
                 "El servicio de validación de usuarios no se encuentra disponible temporalmente. Por favor, intente nuevamente."

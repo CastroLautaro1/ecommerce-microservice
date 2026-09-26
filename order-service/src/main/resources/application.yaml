@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: order-service
+  batch:
+    job:
+      enabled: false
 
   profiles:
     active: local

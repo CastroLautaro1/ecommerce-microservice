@@ -13,7 +13,7 @@ public class OutboxJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
-    private Long aggregateId;
+    private UUID aggregateId;
     private String aggregateType;
     private String eventType;
     private String payload;
@@ -22,7 +22,7 @@ public class OutboxJpaEntity {
     private LocalDateTime createdAt;
     private LocalDateTime processedAt;
 
-    public OutboxJpaEntity(UUID id, Long aggregateId, String aggregateType, String eventType, String payload, OutboxEvent.Status status, String errorMessage, LocalDateTime createdAt, LocalDateTime processedAt) {
+    public OutboxJpaEntity(UUID id, UUID aggregateId, String aggregateType, String eventType, String payload, OutboxEvent.Status status, String errorMessage, LocalDateTime createdAt, LocalDateTime processedAt) {
         this.id = id;
         this.aggregateId = aggregateId;
         this.aggregateType = aggregateType;
@@ -41,7 +41,7 @@ public class OutboxJpaEntity {
         return id;
     }
 
-    public Long getAggregateId() {
+    public UUID getAggregateId() {
         return aggregateId;
     }
 
@@ -77,7 +77,7 @@ public class OutboxJpaEntity {
         this.id = id;
     }
 
-    public void setAggregateId(Long aggregateId) {
+    public void setAggregateId(UUID aggregateId) {
         this.aggregateId = aggregateId;
     }
 

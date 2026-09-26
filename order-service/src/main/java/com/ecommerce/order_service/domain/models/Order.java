@@ -90,6 +90,27 @@ public class Order {
         this.status = OrderStatus.REJECTED;
     }
 
+    // Metodo para obtener los datos mas importantes de una Orden
+    // Para que luego sean guardados en el OutboxEvent
+    public OrderSnapshot toSnapshot() {
+        List<OrderItemSnapshot> itemSnapshots = this.items
+                .stream()
+                .map(i -> new OrderItemSnapshot(
+                        i.getProductId(),
+                        i.getProductName(),
+                        i.getUnitPrice(),
+                        i.getQuantity()
+                ))
+                .toList();
+
+        return new OrderSnapshot(
+                this.orderId,
+                this.status.name(),
+                itemSnapshots,
+                this.totalAmount
+        );
+    }
+
 
     // --- GETTERS ---
     public Long getId() { return id; }

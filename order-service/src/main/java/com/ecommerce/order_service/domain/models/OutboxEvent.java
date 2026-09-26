@@ -6,7 +6,7 @@ import java.util.UUID;
 public class OutboxEvent {
 
     private final UUID id;
-    private final Long aggregateId;
+    private final UUID aggregateId;
     private final String aggregateType;
     private final String eventType; // Ej: 'ORDER_CONFIRMED', 'ORDER_CANCELLED'
     private final String payload; // JSON representando el estado
@@ -20,7 +20,7 @@ public class OutboxEvent {
     }
 
     // Constructor privado
-    private OutboxEvent(UUID id, Long aggregateId, String aggregateType, String eventType,
+    private OutboxEvent(UUID id, UUID aggregateId, String aggregateType, String eventType,
                         String payload, Status status, LocalDateTime createdAt) {
         this.id = id;
         this.aggregateId = aggregateId;
@@ -32,7 +32,7 @@ public class OutboxEvent {
     }
 
     // Constructor para instanciar un nuevo OutboxEvenat
-    public static OutboxEvent createPending(Long aggregateId, String aggregateType,
+    public static OutboxEvent createPending(UUID aggregateId, String aggregateType,
                                             String eventType, String payload) {
         return new OutboxEvent(
                 UUID.randomUUID(),
@@ -65,7 +65,7 @@ public class OutboxEvent {
         return id;
     }
 
-    public Long getAggregateId() {
+    public UUID getAggregateId() {
         return aggregateId;
     }
 

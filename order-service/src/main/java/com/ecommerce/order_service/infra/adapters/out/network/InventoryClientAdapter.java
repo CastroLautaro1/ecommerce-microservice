@@ -1,6 +1,7 @@
 package com.ecommerce.order_service.infra.adapters.out.network;
 
 import com.ecommerce.order_service.domain.exceptions.DomainValidationException;
+import com.ecommerce.order_service.domain.exceptions.ExternalServiceUnavailableException;
 import com.ecommerce.order_service.domain.models.OrderItem;
 import com.ecommerce.order_service.domain.ports.out.InventoryClientPort;
 import com.ecommerce.order_service.infra.adapters.out.network.feign.dto.ReservationResponse;
@@ -8,6 +9,7 @@ import com.ecommerce.order_service.infra.adapters.out.network.feign.dto.StockIte
 import com.ecommerce.order_service.infra.adapters.out.network.feign.dto.StockReservationRequest;
 import com.ecommerce.order_service.infra.adapters.out.network.feign.ports.InventoryFeignClient;
 import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,7 @@ public class InventoryClientAdapter implements InventoryClientPort {
     }
 
     @Override
+    @CircuitBreaker(name = "inventoryService", fallbackMethod = "fallbackForStockReservation")
     public UUID reserveStock(UUID orderId, List<OrderItem> items) {
         List<StockItemRequest> requestItems = items.stream()
                 .map(item -> new StockItemRequest(item.getProductId(), item.getQuantity()))
@@ -47,11 +50,12 @@ public class InventoryClientAdapter implements InventoryClientPort {
 
         } catch (FeignException ex) {
             log.error("Caída de red o error interno en Inventory Service. Orden: {}", orderId);
-            throw new RuntimeException("Falla de comunicación temporal con el gestor de inventarios", ex);
+            throw new ExternalServiceUnavailableException("Falla de comunicación temporal con el gestor de inventarios", ex);
         }
     }
 
     @Override
+    @CircuitBreaker(name = "inventoryService")
     public void confirmReservation(UUID orderId) {
         try {
             log.debug("Confirmando reservas para la Orden: {}", orderId);
@@ -60,11 +64,12 @@ public class InventoryClientAdapter implements InventoryClientPort {
         } catch (FeignException ex) {
             log.error("Falla al confirmar las reservas de la Orden {}. Detalle: {}", orderId, ex.getMessage());
             // En un sistema real esto requeriria encolamiento para reintentarlo de forma asincrona
-            throw new RuntimeException("Falla de red al confirmar la reserva de inventario", ex);
+            throw new ExternalServiceUnavailableException("Falla de red al confirmar la reserva de inventario", ex);
         }
     }
 
     @Override
+    @CircuitBreaker(name = "inventoryService")
     public void cancelReservation(UUID orderId) {
         try {
             log.info("Iniciando transacción compensatoria para revertir las reservas de la Orden: {}", orderId);
@@ -72,7 +77,14 @@ public class InventoryClientAdapter implements InventoryClientPort {
             log.info("Compensación exitosa. Stock liberado para las reservas de la Orden: {}", orderId);
         } catch (FeignException ex) {
             log.error("ALERTA CRÍTICA Falla en compensación para las reservas de la Orden {}. Requiere intervención manual. Detalle: {}", orderId, ex.getMessage());
-            throw new RuntimeException("Falla crítica en reversión de inventario", ex);
+            throw new ExternalServiceUnavailableException("Falla crítica en reversión de inventario", ex);
         }
+    }
+
+    public UUID fallbackForStockReservation(UUID orderId, List<OrderItem> items, Throwable throwable) {
+        throw new ExternalServiceUnavailableException(
+                "El servicio de reservas del Inventario no se encuentra disponible. Por favor, intente nuevamente.",
+                throwable
+        );
     }
 }

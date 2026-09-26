@@ -1,6 +1,7 @@
 package com.ecommerce.order_service.infra.adapters.in.web.exceptions;
 
 import com.ecommerce.order_service.domain.exceptions.DomainValidationException;
+import com.ecommerce.order_service.domain.exceptions.ExternalServiceUnavailableException;
 import com.ecommerce.order_service.domain.exceptions.InvalidOrderStateException;
 import com.ecommerce.order_service.domain.exceptions.OrderNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,6 +44,15 @@ public class GlobalHandlerException {
 
         log.warn("Recurso no encontrado en {}: {}", request.getRequestURI(), ex.getMessage());
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
+    }
+
+    // Servicios externos no disponibles -> 503 Service Unavailable
+    @ExceptionHandler(ExternalServiceUnavailableException.class)
+    public ResponseEntity<Map<String, Object>> handleExternalServiceException(
+            ExternalServiceUnavailableException ex, HttpServletRequest request
+    ) {
+        log.warn("Servicio no disponible en {}: {}", request.getRequestURI(), ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE, request.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,10 +1,12 @@
 package com.ecommerce.order_service.infra.adapters.out.network;
 
 import com.ecommerce.order_service.domain.exceptions.DomainValidationException;
+import com.ecommerce.order_service.domain.exceptions.ExternalServiceUnavailableException;
 import com.ecommerce.order_service.domain.ports.out.CatalogClientPort;
 import com.ecommerce.order_service.infra.adapters.out.network.feign.dto.CatalogProductResponse;
 import com.ecommerce.order_service.infra.adapters.out.network.feign.ports.CatalogFeignClient;
 import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -19,6 +21,7 @@ public class CatalogClientAdapter implements CatalogClientPort {
     }
 
     @Override
+    @CircuitBreaker(name = "catalogService", fallbackMethod = "fallbackForProductSnapshot")
     public Optional<ProductSnapshot> getProductSnapshot(Long productId) {
         try {
             CatalogProductResponse response = feignClient.getProductById(productId);
@@ -33,7 +36,14 @@ public class CatalogClientAdapter implements CatalogClientPort {
             throw new DomainValidationException("El producto con ID " + productId + " no existe en el catálogo.");
         } catch (FeignException ex) {
             // Falla de red genérica o 500 del microservicio
-            throw new RuntimeException("Error de comunicación con Catalog Service", ex);
+            throw new ExternalServiceUnavailableException("Error de comunicación con Catalog Service.");
         }
+    }
+
+    public Optional<ProductSnapshot> fallbackForProductSnapshot(Long productId, Throwable throwable) {
+        throw new ExternalServiceUnavailableException(
+                "El servicio para la obtencion del catálogo no se encuentra disponible. Por favor, intente nuevamente.",
+                throwable
+        );
     }
 }

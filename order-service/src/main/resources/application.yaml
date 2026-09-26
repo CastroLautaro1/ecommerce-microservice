@@ -42,12 +42,32 @@ spring:
             # BLINDAJE: Fuerza el envío de credenciales en la cabecera (Estándar Keycloak)
             client-authentication-method: client_secret_post
 
-application:
-  services:
-    catalog:
-      url: ${CATALOG_SERVICE_URL}
-    inventory:
-      url: ${INVENTORY_SERVICE_URL}
+feign:
+  circuitbreaker:
+    enabled: true # Integración nativa de Feign con Resilience4j
+
+# Configuracion Circuit Breaker
+resilience4j:
+  circuitbreaker:
+    instances:
+      catalogService: # Nombre de la instancia
+        registerHealthIndicator: true
+        slidingWindowSize: 10 # Evalua las ultimas 10 peticiones
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+      inventoryService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+  timelimiter:
+    instances:
+      catalogService:
+        timeoutDuration: 2s # Fast-Fail: Si tarda mas de 2 segundos, lo cuenta como fallo
+      inventoryService:
+        timeoutDuration: 6s # Dar margen a la escritura de las Reservas
 
 # Cliente de Eureka
 eureka:

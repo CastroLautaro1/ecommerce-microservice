@@ -19,8 +19,8 @@ public class OutboxEvent {
         PENDING, COMPLETED, FAILED
     }
 
-    // Constructor privado
-    private OutboxEvent(UUID id, UUID aggregateId, String aggregateType, String eventType,
+    // Constructor para leer desde la BdD
+    public OutboxEvent(UUID id, UUID aggregateId, String aggregateType, String eventType,
                         String payload, Status status, LocalDateTime createdAt) {
         this.id = id;
         this.aggregateId = aggregateId;

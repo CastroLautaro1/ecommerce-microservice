@@ -1,6 +1,5 @@
 package com.ecommerce.order_service.infra.adapters.out.persistence.entity;
 
-import com.ecommerce.order_service.domain.models.OutboxEvent;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -11,18 +10,20 @@ import java.util.UUID;
 public class OutboxJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
     private UUID aggregateId;
     private String aggregateType;
     private String eventType;
     private String payload;
-    private OutboxEvent.Status status;
+
+    @Column(name = "status", nullable = false)
+    private String status;
+
     private String errorMessage;
     private LocalDateTime createdAt;
     private LocalDateTime processedAt;
 
-    public OutboxJpaEntity(UUID id, UUID aggregateId, String aggregateType, String eventType, String payload, OutboxEvent.Status status, String errorMessage, LocalDateTime createdAt, LocalDateTime processedAt) {
+    public OutboxJpaEntity(UUID id, UUID aggregateId, String aggregateType, String eventType, String payload, String status, String errorMessage, LocalDateTime createdAt, LocalDateTime processedAt) {
         this.id = id;
         this.aggregateId = aggregateId;
         this.aggregateType = aggregateType;
@@ -57,7 +58,7 @@ public class OutboxJpaEntity {
         return payload;
     }
 
-    public OutboxEvent.Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
@@ -93,7 +94,7 @@ public class OutboxJpaEntity {
         this.payload = payload;
     }
 
-    public void setStatus(OutboxEvent.Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

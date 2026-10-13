@@ -70,8 +70,7 @@ public class GlobalExceptionHandler {
 
     // Errores inesperados -> 500 Internal Server Error
     @ExceptionHandler({
-            Exception.class,
-            ExternalServiceUnavailableException.class
+            Exception.class
     })
     public ResponseEntity<Map<String, Object>> handleGenericException(
             Exception ex,

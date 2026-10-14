@@ -40,7 +40,7 @@ public class ConfirmOrderService implements ConfirmOrderUseCase {
         orderRepository.save(order);
 
         try {
-            // Transformamos el Snapshot en JSON en la capa correcta
+            // Se transforma el Snapshot en un JSON para guardar la información en el OutboxEvent
             String payload = objectMapper.writeValueAsString(order.toSnapshot());
 
             // Se crea y guarda el OutboxEvent para luego comunicarse con el Inventario

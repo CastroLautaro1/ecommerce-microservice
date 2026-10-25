@@ -41,6 +41,11 @@ public class CatalogClientAdapter implements CatalogClientPort {
     }
 
     public Optional<ProductSnapshot> fallbackForProductSnapshot(Long productId, Throwable throwable) {
+        if (throwable instanceof DomainValidationException) {
+            throw (DomainValidationException) throwable;
+        }
+
+        // Si es una falla de infraestructura se ejecuta la logica de contingencia
         throw new ExternalServiceUnavailableException(
                 "El servicio para la obtencion del catálogo no se encuentra disponible. Por favor, intente nuevamente.",
                 throwable

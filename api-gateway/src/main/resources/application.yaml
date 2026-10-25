@@ -6,7 +6,7 @@ spring:
     name: api-gateway
 
   main:
-    # ProhIbe el arranque de Tomcat/MVC
+    # Prohibe el arranque de Tomcat/MVC
     web-application-type: reactive
 
   security:
@@ -52,12 +52,11 @@ spring:
               uri: lb://inventory-service
               predicates:
                 - Path=/api/v1/inventories # Solo se permite el POST para crear un Inventario
-                # - Path=/api/v1/inventories/**
 
             - id: order-service-route
               uri: lb://order-service
               predicates:
-                - Path=/api/v1/orders # Solo se permite el POST para crear la Orden
+                - Path=/api/v1/orders, /api/v1/orders/**
 
 # Configuración del Cliente de Eureka
 eureka:

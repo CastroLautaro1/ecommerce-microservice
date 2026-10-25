@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: order-service
+  batch:
+    job:
+      enabled: false
 
   profiles:
     active: local
@@ -56,6 +59,8 @@ resilience4j:
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
         permittedNumberOfCallsInHalfOpenState: 3
+        ignoreExceptions:
+          - com.ecommerce.order_service.domain.exceptions.DomainValidationException # Evito que el CircuitBreaker sume los errores 409 en su failureRate
       inventoryService:
         registerHealthIndicator: true
         slidingWindowSize: 10
